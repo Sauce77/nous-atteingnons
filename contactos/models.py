@@ -8,6 +8,7 @@ class Zonal(models.Model):
         Identifica a un zonal en el distrito.
     """
     nombre = models.CharField(max_length=150, null=False, blank=False)
+    comentarios = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.nombre
@@ -18,9 +19,9 @@ class Seccion(models.Model):
     """
     numero = models.IntegerField(null=False, blank=False)
     nombre = models.CharField(max_length=100, null=True, blank=True)
-    rentabilidad = models.FloatField(null=False, blank=False)
+    rentabilidad = models.FloatField(null=True, blank=True)
 
-    zonales = models.ManyToManyField(Zonal)
+    zonales = models.ManyToManyField(Zonal, null=True, blank=True)
 
     def __str__(self):
         return str(self.numero)
@@ -37,11 +38,22 @@ class Contacto(models.Model):
     email = models.CharField(max_length=150, null=True, blank=True)
     domicilio = models.TextField(null=True, blank=True)
     
-    seccion = models.ForeignKey(Seccion, on_delete=models.DO_NOTHING)
+    seccion = models.ForeignKey(Seccion, on_delete=models.SET_NULL, null=True, blank=True)
 
+    def save(self, *args, **kwargs):
+        # en caso de no contar con seccion se asigna una por defecto
+        
+        # busca la categoria 'Sin Seccion' si la encuentra la retorna, sino la crea
+        seccion_por_defecto, creada = Seccion.objects.get_or_create(
+            numero=-1, defaults={"nombre": "Sin Seccion"})
+        
+        if not self.seccion:
+            self.seccion = seccion_por_defecto
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.apellido_paterno} {self.apellido_matero} {self.nombre}"
+        return f"{self.apellido_paterno} {self.apellido_materno} {self.nombre}"
     
 class Relacion(models.Model):
     """

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Funciona perra!</h1>
+<h1>Tabla de Contactos</h1>
 
 <table id="tablaContactos" class="table">
     <thead class="table-dark">
@@ -11,7 +11,7 @@
             <th>Nombre</th>
             <th>Telefono</th>
             <th>Email</th>
-            <th>Direccion</th>
+            <th>Domicilio</th>
         </tr>
     </thead>
     <tbody>
@@ -22,7 +22,7 @@
                 <td>{{ contacto.nombre }}</td>
                 <td>{{ contacto.telefono }}</td>
                 <td>{{ contacto.email }}</td>
-                <td>{{ contacto.direccion }}</td>
+                <td>{{ contacto.domicilio }}</td>
             </tr>
         {% endfor %}
     </tbody>
