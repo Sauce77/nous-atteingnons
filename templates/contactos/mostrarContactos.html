@@ -2,4 +2,36 @@
 
 {% block content %}
 <h1>Funciona perra!</h1>
+
+<table id="tablaContactos" class="table">
+    <thead class="table-dark">
+        <tr>
+            <th>Apellido Paterno</th>
+            <th>Apellido Materno</th>
+            <th>Nombre</th>
+            <th>Telefono</th>
+            <th>Email</th>
+            <th>Direccion</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for contacto in contactos %}
+            <tr>
+                <td>{{ contacto.apellido_paterno }}</td>
+                <td>{{ contacto.apellido_materno }}</td>
+                <td>{{ contacto.nombre }}</td>
+                <td>{{ contacto.telefono }}</td>
+                <td>{{ contacto.email }}</td>
+                <td>{{ contacto.direccion }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+<script>
+    $(document).ready( function () {
+        $('#tablaContactos').DataTable();
+    } );
+</script>
 {% endblock %}

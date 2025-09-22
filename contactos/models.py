@@ -17,6 +17,7 @@ class Seccion(models.Model):
         Identifica una seccion del distrito.
     """
     numero = models.IntegerField(null=False, blank=False)
+    nombre = models.CharField(max_length=100, null=True, blank=True)
     rentabilidad = models.FloatField(null=False, blank=False)
 
     zonales = models.ManyToManyField(Zonal)
@@ -31,9 +32,9 @@ class Contacto(models.Model):
     """
     nombre = models.CharField(max_length=150, null=False, blank=False)
     apellido_paterno = models.CharField(max_length=150, null=False, blank=False)
-    apellido_matero = models.CharField(max_length=150, null=False, blank=False)
+    apellido_materno = models.CharField(max_length=150, null=False, blank=False)
     telefono = models.CharField(max_length=10, null=True, blank=True)
-    email = models.CharField(max_length=10, null=True, blank=True)
+    email = models.CharField(max_length=150, null=True, blank=True)
     domicilio = models.TextField(null=True, blank=True)
     
     seccion = models.ForeignKey(Seccion, on_delete=models.DO_NOTHING)
