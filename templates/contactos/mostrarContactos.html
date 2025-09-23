@@ -3,7 +3,7 @@
 {% block content %}
 <h1>Tabla de Contactos</h1>
 
-<table id="tablaContactos" class="table">
+<table id="tablaContactos" class="table table-hover">
     <thead class="table-dark">
         <tr>
             <th>Apellido Paterno</th>
@@ -16,7 +16,7 @@
     </thead>
     <tbody>
         {% for contacto in contactos %}
-            <tr>
+            <tr data-href="{% url 'contactos:mostrarPerfilContacto' id_contacto=contacto.id %}">
                 <td>{{ contacto.apellido_paterno }}</td>
                 <td>{{ contacto.apellido_materno }}</td>
                 <td>{{ contacto.nombre }}</td>
@@ -33,5 +33,16 @@
     $(document).ready( function () {
         $('#tablaContactos').DataTable();
     } );
+
+    // dirigir click a perfil
+    document.addEventListener('DOMContentLoaded', () => {
+    const filas = document.querySelectorAll('tr[data-href]');
+
+    filas.forEach(fila => {
+        fila.addEventListener('click', () => {
+        window.location.href = fila.dataset.href;
+        });
+    });
+    });
 </script>
 {% endblock %}

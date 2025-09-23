@@ -17,3 +17,18 @@ def mostrarContactos(request):
     }
 
     return render(request, "contactos/mostrarContactos.html", contexto)
+
+
+def mostrarPerfilContacto(request, id_contacto):
+
+    try:
+        # obtenemos objeto del usuario seleccionado
+        contacto = Contacto.objects.get(pk=id_contacto)
+    except Contacto.DoesNotExist:
+        return render(request, "core/error.html")
+    
+    contexto = {
+        "contacto": contacto,
+    }
+
+    return render(request, "contactos/mostrarPerfilContacto.html", contexto)
