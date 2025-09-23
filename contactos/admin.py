@@ -1,8 +1,7 @@
 from django.contrib import admin
 
-from .models import Zonal, Seccion, Contacto, Relacion
+from .models import Zonal, Seccion, Contacto
 # Register your models here.
 admin.site.register(Zonal)
 admin.site.register(Seccion)
 admin.site.register(Contacto)
-admin.site.register(Relacion)

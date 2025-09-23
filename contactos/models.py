@@ -40,6 +40,8 @@ class Contacto(models.Model):
     
     seccion = models.ForeignKey(Seccion, on_delete=models.SET_NULL, null=True, blank=True)
 
+    seguidores = models.ManyToManyField('self', symmetrical=False, blank=True, null=True)
+
     def save(self, *args, **kwargs):
         # en caso de no contar con seccion se asigna una por defecto
         
@@ -55,28 +57,3 @@ class Contacto(models.Model):
     def __str__(self):
         return f"{self.apellido_paterno} {self.apellido_materno} {self.nombre}"
     
-class Relacion(models.Model):
-    """
-        Muestra una relacion en la red de contactos.
-        Verifica que las relaciones sean unicas y unidireccionales.
-    """
-
-    TIPOS_RELACION = {
-        ("follow", "FOLLOW"),
-        ("block", "BLOCK")
-    }
-
-    contacto_master = models.ForeignKey(Contacto, related_name='inicio_relacion',on_delete=models.SET_NULL, null=True)
-    contacto_detail = models.ForeignKey(Contacto, related_name='recibio_relacion',on_delete=models.SET_NULL, null=True)
-
-    ultima_modificacion = models.DateField(auto_now=True)
-    tipo_relacion = models.CharField(max_length=15, choices=TIPOS_RELACION)
-    descripcion = models.TextField(null=True, blank=True)
-
-    def clean(self):
-        # valida si se ingresaron dos usuarios al crear o modificar una relacion
-        if self.contacto_master == None or self.contacto_detail == None:
-            raise ValidationError("Relation must be created with two contacts.")
-
-    def __str__(self):
-        return str(self.ultima_modificacion)

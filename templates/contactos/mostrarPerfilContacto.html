@@ -55,6 +55,16 @@
     </div><!-- info contacto -->
 
   </div>
+</div><!-- tarjeta de contacto -->
+
+<div>
+    {% if contacto.seguidores.all %}
+        {% for seguidor in contacto.seguidores.all %}
+            <p>{{ seguidor.nombre }} {{ seguidor.apellido_paterno}} {{ seguidor.apellido_materno}}</p>
+        {% endfor %}
+    {% else %}
+        <p>Este contacto no tiene relaciones ingresadas.</p>
+    {% endif %}
 </div>
 
 
