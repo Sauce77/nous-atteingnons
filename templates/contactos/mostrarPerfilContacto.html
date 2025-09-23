@@ -62,16 +62,6 @@
   Insertar Relacion
 </button>
 
-<div> <!-- seguidores -->
-    {% if contacto.seguidores.all %}
-        {% for seguidor in contacto.seguidores.all %}
-            <p>{{ seguidor.nombre }} {{ seguidor.apellido_paterno}} {{ seguidor.apellido_materno}}</p>
-        {% endfor %}
-    {% else %}
-        <p>Este contacto no tiene relaciones ingresadas.</p>
-    {% endif %}
-</div>
-
 
 <!-- Modal -->
 <div class="modal fade" id="modalRelacion" tabindex="-1" aria-labelledby="modalRelacion" aria-hidden="true">

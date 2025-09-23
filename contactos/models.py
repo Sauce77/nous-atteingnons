@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.exceptions import ValidationError
+from mptt.models import MPTTModel, TreeForeignKey
 
 # Create your models here.
 
@@ -27,7 +28,7 @@ class Seccion(models.Model):
         return str(self.numero)
     
 
-class Contacto(models.Model):
+class Contacto(MPTTModel):
     """
         Identifica a una persona dentro de la red de contactos del sistema.
     """
@@ -40,7 +41,10 @@ class Contacto(models.Model):
     
     seccion = models.ForeignKey(Seccion, on_delete=models.SET_NULL, null=True, blank=True)
 
-    seguidores = models.ManyToManyField('self', symmetrical=False, blank=True, null=True)
+    parent = TreeForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='children')
+
+    class MPTTMeta:
+        order_insertion_by = ['apellido_paterno']
 
     def save(self, *args, **kwargs):
         # en caso de no contar con seccion se asigna una por defecto
