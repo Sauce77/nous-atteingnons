@@ -25,7 +25,11 @@ def mostrarPerfilContacto(request, id_contacto):
         # obtenemos objeto del usuario seleccionado
         contacto = Contacto.objects.get(pk=id_contacto)
     except Contacto.DoesNotExist:
-        return render(request, "core/error.html")
+        contexto = {
+            "titulo": "Contacto no encontrado.",
+            "descripcion": "El contacto seleccionado no pudo ser encontrado en los registros."
+        }
+        return render(request, "core/error.html", contexto)
 
     # obtenemos todas las secciones
     secciones = Seccion.objects.all()
