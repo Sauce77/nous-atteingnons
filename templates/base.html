@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Sitio Web con Bootstrap</title>
+    <title>Buscador</title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
@@ -33,37 +33,23 @@
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container-fluid">
-        <a class="navbar-brand" href="#">Mi Sitio</a>
+        <a class="navbar-brand" href="{% url 'contactos:mostrarContactos' %}" title="Contactos">
+
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-globe-americas-fill" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="m8 0 .412.01A7.97 7.97 0 0 1 13.29 2a8.04 8.04 0 0 1 2.548 4.382 8 8 0 1 1-15.674 0 8 8 0 0 1 1.361-3.078A8 8 0 0 1 2.711 2 7.96 7.96 0 0 1 8 0m0 1a7 7 0 0 0-5.958 3.324C2.497 6.192 6.669 7.827 6.5 8c-.5.5-1.034.884-1 1.5.07 1.248 2.259.774 2.5 2 .202 1.032-1.051 3 0 3 1.5-.5 3.798-3.186 4-5 .138-1.242-2-2-3.5-2.5-.828-.276-1.055.648-1.5.5S4.5 5.5 5.5 5s1 0 1.5.5c1 .5.5-1 1-1.5.838-.838 3.16-1.394 3.605-2.001A6.97 6.97 0 0 0 8 1"/>
+          </svg><!-- icono navbar -->
+
+        </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#">Inicio</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Productos</a>
-            </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Servicios
-              </a>
-              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <li><a class="dropdown-item" href="#">Diseño Web</a></li>
-                <li><a class="dropdown-item" href="#">Desarrollo Móvil</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="#">Consultoría</a></li>
-              </ul>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Contacto</a>
+              <a class="nav-link active" aria-current="page" href="{% url 'contactos:mostrarContactos' %}">Inicio</a>
             </li>
           </ul>
-          <form class="d-flex" role="search">
-            <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
-            <button class="btn btn-outline-success" type="submit">Buscar</button>
-          </form>
+
         </div>
       </div>
     </nav>
@@ -75,35 +61,6 @@
 
     <footer class="bg-dark text-white pt-5 pb-4">
         <div class="container text-center text-md-left">
-            <div class="row text-center text-md-left">
-                <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mt-3">
-                    <h5 class="text-uppercase mb-4 font-weight-bold text-warning">Mi Sitio</h5>
-                    <p>Aquí puedes agregar una breve descripción de tu sitio web, tu empresa o cualquier otra información relevante.</p>
-                </div>
-                
-                <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mt-3">
-                    <h5 class="text-uppercase mb-4 font-weight-bold text-warning">Productos</h5>
-                    <p><a href="#" class="text-white" style="text-decoration: none;">Productos 1</a></p>
-                    <p><a href="#" class="text-white" style="text-decoration: none;">Productos 2</a></p>
-                    <p><a href="#" class="text-white" style="text-decoration: none;">Productos 3</a></p>
-                    <p><a href="#" class="text-white" style="text-decoration: none;">Productos 4</a></p>
-                </div>
-                
-                <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mt-3">
-                    <h5 class="text-uppercase mb-4 font-weight-bold text-warning">Enlaces Útiles</h5>
-                    <p><a href="#" class="text-white" style="text-decoration: none;">Tu Cuenta</a></p>
-                    <p><a href="#" class="text-white" style="text-decoration: none;">Política de Privacidad</a></p>
-                    <p><a href="#" class="text-white" style="text-decoration: none;">Ayuda</a></p>
-                    <p><a href="#" class="text-white" style="text-decoration: none;">Envíos</a></p>
-                </div>
-    
-                <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mt-3">
-                    <h5 class="text-uppercase mb-4 font-weight-bold text-warning">Contacto</h5>
-                    <p><i class="bi bi-house-door-fill me-2"></i> Ciudad, País</p>
-                    <p><i class="bi bi-envelope-fill me-2"></i> info@mi-sitio.com</p>
-                    <p><i class="bi bi-telephone-fill me-2"></i> +01 234 567 89</p>
-                </div>
-            </div>
             
             <hr class="mb-4">
     

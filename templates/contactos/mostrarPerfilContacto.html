@@ -1,5 +1,61 @@
 {% extends "base.html" %}
 
 {% block content %}
-Fuck it! {{ contacto.nombre }}
+
+<div class="card mb-3">
+  <div class="row g-0">
+    <div class="col-md-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="auto" height="12rem" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+            <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+            <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
+        </svg> <!-- user icon -->
+    </div>
+
+    <div class="col-md-10">
+      <div class="card-body">
+        <h5 class="card-title">{{ contacto.nombre }} {{ contacto.apellido_paterno }} {{ contacto.apellido_materno }}</h5>
+        <div class="d-flex flex-row gap-5 fs-5">
+            <p><strong>Email:</strong>
+                {% if contacto.email %}
+                    {{ contacto.email }}
+                {% else %}
+                    Email no disponible
+                {% endif %}
+            </p>
+            <p><strong>Telefono:</strong>
+                {% if contacto.email %}
+                    {{ contacto.telefono }}
+                {% else %}
+                    Telefono no disponible
+                {% endif %}
+            </p>
+        </div><!-- div contacto -->
+
+        <p><strong>Domicilio: </strong>{{ contacto.domicilio }}</p>
+        
+        <p><strong>Seccion:</strong>
+            {% if contacto.seccion.numero > 0 %}
+                {{ contacto.seccion.numero }}
+            {% else %}
+                {{ contacto.seccion.nombre }}
+            {% endif %}
+        </p>
+        <div class="d-flex flex-row">
+            <p><strong>Zonales:</strong>
+                {% if contacto.seccion.zonales.all %}
+                    {% for zonal in contacto.seccion.zonales.all %}
+                        <p>{{ zonal.nombre }}</p>
+                    {% endfor %}
+                {% else %}
+                    No hay zonales asignados a esta seccion.
+                {% endif %}
+            </p>
+        </div><!-- div zonales -->
+      </div>
+    </div><!-- info contacto -->
+
+  </div>
+</div>
+
+
 {% endblock %}
