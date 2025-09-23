@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.urls import reverse
 
 
 from .models import Contacto, Seccion
@@ -30,6 +31,9 @@ def mostrarPerfilContacto(request, id_contacto):
             "descripcion": "El contacto seleccionado no pudo ser encontrado en los registros."
         }
         return render(request, "core/error.html", contexto)
+    
+    # obtenemos url para serializador del arbol
+    api_url = reverse('api:mostrarSubArbol', args=[contacto.pk])
 
     # obtenemos todas las secciones
     secciones = Seccion.objects.all()
@@ -95,6 +99,7 @@ def mostrarPerfilContacto(request, id_contacto):
     contexto = {
         "contacto": contacto,
         "secciones": secciones,
+        "api_url": api_url
     }
 
     return render(request, "contactos/mostrarPerfilContacto.html", contexto)

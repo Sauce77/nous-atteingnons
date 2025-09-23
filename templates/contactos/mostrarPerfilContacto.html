@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 
@@ -61,6 +62,10 @@
 <button type="button" class="btn btn-primary my-2" data-bs-toggle="modal" data-bs-target="#modalRelacion">
   Insertar Relacion
 </button>
+
+<!-- diagrama jerarquico -->
+<h5 class="text-center">Red de Alcance</h5>
+<div id="chart_div"></div>
 
 
 <!-- Modal -->
@@ -153,5 +158,13 @@ $(document).ready(function(){
     });
 });
 </script>
+
+
+<script>
+      const apiUrl = "{{ api_url }}"; 
+</script>
+<script type="text/javascript" src="{% static 'scripts/contactos/organigrama.js' %}"></script>
+
+
 
 {% endblock %}

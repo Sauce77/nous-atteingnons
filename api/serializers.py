@@ -8,7 +8,12 @@ class ContactoSerializer(serializers.ModelSerializer):
         Serializa la informacion de cada nodo en el arbol para
         convertirla a json.
     """
+
+    # serializa los hijos de cada nodo
     children = serializers.SerializerMethodField()
+
+    # serializa el numero de descendientes
+    descendant_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Contacto
@@ -16,6 +21,7 @@ class ContactoSerializer(serializers.ModelSerializer):
                   'nombre', 
                   'apellido_paterno', 
                   'apellido_materno',
+                  'descendant_count',
                   'children')
 
     def get_children(self, obj):
@@ -25,3 +31,7 @@ class ContactoSerializer(serializers.ModelSerializer):
         if children_queryset:
             return ContactoSerializer(children_queryset, many=True).data
         return []
+    
+    def get_descendant_count(self, obj):
+        # Utiliza el método de MPTT para obtener el conteo de descendientes
+        return obj.get_descendant_count()
