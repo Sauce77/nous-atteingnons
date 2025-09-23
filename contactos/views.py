@@ -87,12 +87,10 @@ def mostrarPerfilContacto(request, id_contacto):
                     email=email,
                     telefono=telefono,
                     domicilio=domicilio,
-                    seccion=seccion
+                    seccion=seccion,
+                    parent=contacto
                 )
                 nuevo_contacto.save()
-
-                # anadimos el nuevo contacto a las relaciones
-                contacto.seguidores.add(nuevo_contacto)
             
     contexto = {
         "contacto": contacto,
