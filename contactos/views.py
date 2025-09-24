@@ -55,13 +55,26 @@ def editarContacto(request, id_contacto):
 
             # obtenemos numero_seccion del contacto
             numero_seccion = request.POST.get('seccion')
+            # obtenemos id del contacto asociado
+            numero_contacto_asociado = request.POST.get('padre')
+
             # obtenemos seccion del contacto
             try:
                 seccion = Seccion.objects.get(numero=numero_seccion)
             except Seccion.DoesNotExist:
                 contexto = {
                     "titulo": "La seccion elegida no fue encontrada.",
-                    "descripcion": "No hay registro de la seccion elegida al insertar el contacto."
+                    "descripcion": "No hay registro de la seccion elegida al modificar el contacto."
+                }
+                return render(request, "core/error.html", contexto)
+            
+            # obtenemos contacto asociado del contacto
+            try:
+                contacto_asociado = Contacto.objects.get(pk=numero_contacto_asociado)
+            except Contacto.DoesNotExist:
+                contexto = {
+                    "titulo": "Contacto asociado no encontrado.",
+                    "descripcion": "No hay registro del contacto asociado elegido al editar la relacion del contacto."
                 }
                 return render(request, "core/error.html", contexto)
 
@@ -89,6 +102,7 @@ def editarContacto(request, id_contacto):
                 contacto.telefono=telefono
                 contacto.domicilio=domicilio
                 contacto.seccion=seccion
+                contacto.parent=contacto_asociado
 
                 contacto.save()
 

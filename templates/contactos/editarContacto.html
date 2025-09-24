@@ -11,12 +11,12 @@
 
             <!-- selector contacto asociado -->
             {% if contactos %}
-            <div class="d-flex flex-row">
+            <div class="d-flex flex-row" id="divDropdownPadre">
                 <p class="my-2 me-2">Contacto asociado:</p>
                 <div class="dropdown my-2">
                     <button class="btn btn-dark dropdown-toggle" type="button" id="dropdownPadreButton" data-bs-toggle="dropdown" aria-expanded="false">
-                        {% if contacto.padre %}
-                            <strong>{{ contacto.padre.seccion.numero }}:</strong> {{ contacto.padre.apellido_paterno }} {{ contacto.padre.apellido_materno }} {{ contacto.padre.nombre }} 
+                        {% if contacto.parent %}
+                            <strong>{{ contacto.parent.seccion.numero }}:</strong> {{ contacto.parent.apellido_paterno }} {{ contacto.parent.apellido_materno }} {{ contacto.parent.nombre }} 
                         {% else %}
                             Sin contacto asociado
                         {% endif %}
@@ -28,7 +28,7 @@
 
                         {% for aux_contacto in contactos %}
                             {% if aux_contacto.id != contacto.id %}
-                                <li class="dropdown-item" data-value="{{ contacto.id }}">
+                                <li class="dropdown-item" data-value="{{ aux_contacto.id }}">
                                     <strong>{{ aux_contacto.seccion.numero }}:</strong> {{ aux_contacto.apellido_paterno }} {{ aux_contacto.apellido_materno }} {{ aux_contacto.nombre }}
                                 </li>
                             {% endif %}
@@ -36,14 +36,13 @@
                     </ul>
                 </div>
 
-                <input type="hidden" name="seccion" id="inputPadreSeleccionado" value="{{ contacto.padre.id }}">
+                <input type="hidden" name="padre" id="inputPadreSeleccionado" value="{{ contacto.parent.id }}">
             </div>
             {% else %}
                 <p class="m-2"><i>**No hay contactos disponibles en el sistema.</i></p>
             {% endif %}
             <hr>
 
-            <input type="hidden" name="id_user_master" value="{{ contacto.id }}">
             <div class="d-flex flex-row gap-1 mb-2">
                 <input type="text" name="nombre" class="form-control" placeholder="Nombre(s)" value="{{ contacto.nombre }}">
                 <input type="text" name="apellido_paterno" class="form-control" placeholder="Apellido Paterno" value="{{ contacto.apellido_paterno }}">
@@ -55,7 +54,7 @@
 
             <!-- selector secciones -->
             {% if secciones %}
-                <div class="d-flex flex-row">
+                <div class="d-flex flex-row" id="divDropdownSeccion">
                     <p class="my-2 me-2">Seccion:</p>
                     <div class="dropdown my-2">
                         <button class="btn btn-dark dropdown-toggle" type="button" id="dropdownSeccionButton" data-bs-toggle="dropdown" aria-expanded="false">
@@ -82,7 +81,7 @@
                         </ul>
                     </div>
 
-                    <input type="hidden" name="seccion" id="inputSeccionSeleccionada" value="{{ contacto.seccion }}">
+                    <input type="hidden" name="seccion" id="inputSeccionSeleccionada" value="{{ contacto.seccion.id }}">
                 </div>
             {% else %}
                 <p class="m-2"><i>**No hay secciones registradas en el sistema.</i></p>
@@ -114,11 +113,9 @@ $(document).ready(function(){
     });
 
     // Lógica para actualizar el botón y el campo oculto
-    $('.dropdown-menu li').on('click', function() {
+    $('#divDropdownPadre .dropdown-menu li').on('click', function() {
         var selectedText = $(this).text();
         var selectedValue = $(this).data('value'); // Obtiene el valor del atributo 'data-value'
-
-        console.log(selectedValue);
 
         // Actualiza el texto del botón
         $('#dropdownPadreButton').text(selectedText);
@@ -144,11 +141,9 @@ $(document).ready(function(){
     });
 
     // Lógica para actualizar el botón y el campo oculto
-    $('.dropdown-menu li').on('click', function() {
+    $('#divDropdownSeccion .dropdown-menu li').on('click', function() {
         var selectedText = $(this).text();
         var selectedValue = $(this).data('value'); // Obtiene el valor del atributo 'data-value'
-
-        console.log(selectedValue);
 
         // Actualiza el texto del botón
         $('#dropdownSeccionButton').text(selectedText);
