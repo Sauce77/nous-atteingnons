@@ -68,15 +68,21 @@ def editarContacto(request, id_contacto):
                 }
                 return render(request, "core/error.html", contexto)
             
-            # obtenemos contacto asociado del contacto
-            try:
-                contacto_asociado = Contacto.objects.get(pk=numero_contacto_asociado)
-            except Contacto.DoesNotExist:
-                contexto = {
-                    "titulo": "Contacto asociado no encontrado.",
-                    "descripcion": "No hay registro del contacto asociado elegido al editar la relacion del contacto."
-                }
-                return render(request, "core/error.html", contexto)
+            # al principio no hay un contacto asociado
+            contacto_asociado = None
+            
+            # si el hay numero de contacto asociado
+            if numero_contacto_asociado:
+
+                # obtenemos contacto asociado del contacto
+                try:
+                    contacto_asociado = Contacto.objects.get(pk=numero_contacto_asociado)
+                except Contacto.DoesNotExist:
+                    contexto = {
+                        "titulo": "Contacto asociado no encontrado.",
+                        "descripcion": "No hay registro del contacto asociado elegido al editar la relacion del contacto."
+                    }
+                    return render(request, "core/error.html", contexto)
 
             # filtramos contactos por seccion y apellido paterno (sin considerar mayusculas)
             contactos_repetidos = Contacto.objects.filter(seccion=seccion).filter(apellido_paterno__iexact=apellido_paterno)

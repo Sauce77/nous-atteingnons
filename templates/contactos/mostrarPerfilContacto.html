@@ -14,7 +14,18 @@
 
     <div class="col-md-10">
       <div class="card-body">
-        <h5 class="card-title">{{ contacto.nombre }} {{ contacto.apellido_paterno }} {{ contacto.apellido_materno }}</h5>
+        <h3 class="card-title ">{{ contacto.nombre }} {{ contacto.apellido_paterno }} {{ contacto.apellido_materno }}</h3>
+        {% if contacto.parent %}
+            <p>
+                <strong>Contacto Asociado:</strong> 
+                <a href="{% url 'contactos:mostrarPerfilContacto' id_contacto=contacto.parent.id %}" class="link-dark">
+                    {{ contacto.parent.nombre }} {{ contacto.parent.apellido_paterno }} {{ contacto.parent.apellido_materno }}
+                </a>
+            </p>
+        {% else %}
+            <p class="m-2"><i>**Sin contacto asociado.</i></p>
+        {% endif %}
+    
         <div class="d-flex flex-row gap-5 fs-5">
             <p><strong>Email:</strong>
                 {% if contacto.email %}
