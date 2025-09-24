@@ -98,9 +98,13 @@ def editarContacto(request, id_contacto):
     # obtenemos secciones
     secciones = Seccion.objects.all()
 
+    # obtenemos contactos
+    contactos = Contacto.objects.all()
+
     contexto = {
         "contacto": contacto,
         "secciones": secciones,
+        "contactos": contactos,
     }
 
     return render(request, "contactos/editarContacto.html", contexto)

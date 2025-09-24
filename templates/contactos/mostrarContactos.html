@@ -26,8 +26,17 @@
                 <td>{{ contacto.apellido_paterno }}</td>
                 <td>{{ contacto.apellido_materno }}</td>
                 <td>{{ contacto.nombre }}</td>
-                <td>{{ contacto.telefono }}</td>
-                <td>{{ contacto.email }}</td>
+                {% if contacto.telefono %}
+                    <td>{{ contacto.telefono }}</td>
+                {% else %}
+                    <td>Sin telefono</td>
+                {% endif %}
+
+                {% if contacto.email %}
+                    <td>{{ contacto.email }}</td>
+                {% else %}
+                    <td>Sin Email</td>
+                {% endif %}
             </tr>
         {% endfor %}
     </tbody>
