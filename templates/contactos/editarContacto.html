@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card">
+    
+    <div class="card-body">
+        <h3 class="card-title">Editar Contacto</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="id_user_master" value="{{ contacto.id }}">
+            <div class="d-flex flex-row gap-1 mb-2">
+                <input type="text" name="nombre" class="form-control" placeholder="Nombre(s)" value="{{ contacto.nombre }}">
+                <input type="text" name="apellido_paterno" class="form-control" placeholder="Apellido Paterno" value="{{ contacto.apellido_paterno }}">
+                <input type="text" name="apellido_materno" class="form-control" placeholder="Apellido Materno" value="{{ contacto.apellido_materno }}">
+            </div>
+            <input type="text" name="email" class="form-control mb-2" placeholder="E-Mail" value="{{ contacto.email }}">
+            <input type="text" name="telefono" class="form-control mb-2" placeholder="Telefono" value="{{ contacto.telefono }}">
+            <textarea name="domicilio" class="form-control mb-2" placeholder="Domicilio">{{ contacto.domicilio }}</textarea>
+
+            <!-- selector secciones -->
+            {% if secciones %}
+                <div class="d-flex flex-row">
+                    <p class="my-2 me-2">Seccion:</p>
+                    <div class="dropdown my-2">
+                        <button class="btn btn-dark dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                            {% if contacto.seccion.numero > 0 %}
+                                {{ contacto.seccion.numero }}
+                            {% else %}
+                                {{ contacto.seccion.nombre }}
+                            {% endif%}
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <div class="px-3 py-2">
+                                <input type="text" class="form-control" id="myInput" placeholder="Buscar...">
+                            </div>
+
+                            {% for seccion in secciones %}
+                                <li class="dropdown-item" data-value="{{ seccion.numero }}">
+                                    {% if seccion.numero > 0 %}
+                                        {{ seccion.numero }}
+                                    {% else %}
+                                        {{ seccion.nombre }}
+                                    {% endif%}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <input type="hidden" name="seccion" id="inputSeccionSeleccionada" value="{{ contacto.seccion }}">
+                </div>
+            {% else %}
+                <p class="m-2"><i>**No hay secciones registradas en el sistema.</i></p>
+            {% endif %}
+            
+            <hr>
+            <div class="d-flex gap-2 mt-3">
+                <input type="submit" class="btn btn-primary flex-fill" name="submitGuardar" value="Guardar">
+                
+                <a href="{% url 'contactos:mostrarPerfilContacto' id_contacto=contacto.id %}" class="btn btn-danger flex-fill text-decoration-none text-white">
+                    Cancelar
+                </a>
+            </div>
+            
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

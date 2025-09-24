@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
 
 
@@ -19,8 +19,96 @@ def mostrarContactos(request):
 
     return render(request, "contactos/mostrarContactos.html", contexto)
 
+def editarContacto(request, id_contacto):
+    """
+        Permite modificar la informacion y la relacion de un contacto seleccionado.
+    """
+    try:
+        # obtenemos contacto
+        contacto = Contacto.objects.get(pk=id_contacto)
+    except Contacto.DoesNotExist:
+        contexto = {
+            "titulo": "Contacto no pudo ser encontrado.",
+            "descripcion": "El contacto no se encuentra registrado."
+        }
+        return render(request, "core/error.html", contacto)
+    
+    # logica post form
+    if request.method == "POST":
+        # obtenemos boton submitGuardar
+        submitGuardar = request.POST.get('submitGuardar')
+
+        # si el valor de submitGuardar es 'Guardar'
+        if submitGuardar == "Guardar":
+            # obtenemos nombre del contacto
+            nombre = request.POST.get('nombre')
+            # obtenemos apellido paterno del contacto
+            apellido_paterno = request.POST.get('apellido_paterno')
+            # obtenemos apellido materno del contacto
+            apellido_materno = request.POST.get('apellido_materno')
+            # obtenemos email del contacto
+            email = request.POST.get('email')
+            # obtenemos telefono del contacto
+            telefono = request.POST.get('telefono')
+            # obtenemos domicilio del contacto
+            domicilio = request.POST.get('domicilio')
+
+            # obtenemos numero_seccion del contacto
+            numero_seccion = request.POST.get('seccion')
+            # obtenemos seccion del contacto
+            try:
+                seccion = Seccion.objects.get(numero=numero_seccion)
+            except Seccion.DoesNotExist:
+                contexto = {
+                    "titulo": "La seccion elegida no fue encontrada.",
+                    "descripcion": "No hay registro de la seccion elegida al insertar el contacto."
+                }
+                return render(request, "core/error.html", contexto)
+
+            # filtramos contactos por seccion y apellido paterno (sin considerar mayusculas)
+            contactos_repetidos = Contacto.objects.filter(seccion=seccion).filter(apellido_paterno__iexact=apellido_paterno)
+            # filtramos contactos por nombre (sin considerar mayusculas) y apellido materno (sin considerar mayusculas)
+            contactos_repetidos = contactos_repetidos.filter(nombre__iexact=nombre).filter(apellido_materno__iexact=apellido_materno)
+            # excluimos el contacto a editar
+            contactos_repetidos = contactos_repetidos.exclude(pk=contacto.id)
+
+            if contactos_repetidos:
+                contexto = {
+                    "titulo": "El contacto a insertar, ya existe.",
+                    "descripcion": "Se ha encontrado un contacto que coincide en seccion, nombre y apellidos."
+                }
+                # si existen contactos repetidos redirigir
+                return render(request, "core/error.html", contexto)
+            
+            else:
+                # si no actualizamos los valores actuales
+                contacto.nombre=nombre
+                contacto.apellido_paterno=apellido_paterno
+                contacto.apellido_materno=apellido_materno
+                contacto.email=email
+                contacto.telefono=telefono
+                contacto.domicilio=domicilio
+                contacto.seccion=seccion
+
+                contacto.save()
+
+                return redirect('contactos:mostrarPerfilContacto', id_contacto=contacto.id)
+            
+
+    # obtenemos secciones
+    secciones = Seccion.objects.all()
+
+    contexto = {
+        "contacto": contacto,
+        "secciones": secciones,
+    }
+
+    return render(request, "contactos/editarContacto.html", contexto)
 
 def mostrarPerfilContacto(request, id_contacto):
+    """
+        Muestra la informacion de contacto y sus relaciones.
+    """
 
     try:
         # obtenemos objeto del usuario seleccionado
