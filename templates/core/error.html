@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="card text-bg-dark w-50 mx-auto">
+  <img src="{% static 'img/core/error.gif' %}" class="card-img" alt="error image">
+  <div class="card-img-overlay">
+    <div class="card">
+        <div class="card-body text-center">
+            <h5 class="card-title text-danger">Error: {{ titulo }}</h5>
+            <p class="card-text">{{ descripcion }}</p>
+
+            <a href="{% url 'contactos:mostrarContactos' %}" class="link-dark">Ir al inicio</a>
+        </div>
+    </div>
+  </div>
+</div>
+
+
+
+{% endblock %}

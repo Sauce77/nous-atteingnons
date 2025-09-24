@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="card my-2">
+  <div class="row g-0">
+    <div class="col-md-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12rem" height="12rem" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+            <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+            <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
+        </svg> <!-- user icon -->
+    </div>
+
+    <div class="col-md-10">
+      <div class="card-body">
+        <h5 class="card-title">{{ contacto.nombre }} {{ contacto.apellido_paterno }} {{ contacto.apellido_materno }}</h5>
+        <div class="d-flex flex-row gap-5 fs-5">
+            <p><strong>Email:</strong>
+                {% if contacto.email %}
+                    {{ contacto.email }}
+                {% else %}
+                    Email no disponible
+                {% endif %}
+            </p>
+            <p><strong>Telefono:</strong>
+                {% if contacto.email %}
+                    {{ contacto.telefono }}
+                {% else %}
+                    Telefono no disponible
+                {% endif %}
+            </p>
+        </div><!-- div contacto -->
+
+        <p><strong>Domicilio: </strong>{{ contacto.domicilio }}</p>
+        
+        <p><strong>Seccion:</strong>
+            {% if contacto.seccion.numero > 0 %}
+                {{ contacto.seccion.numero }}
+            {% else %}
+                {{ contacto.seccion.nombre }}
+            {% endif %}
+        </p>
+        <div class="d-flex flex-row">
+            <p><strong>Zonales:</strong>
+                {% if contacto.seccion.zonales.all %}
+                    {% for zonal in contacto.seccion.zonales.all %}
+                        <p>{{ zonal.nombre }}</p>
+                    {% endfor %}
+                {% else %}
+                    No hay zonales asignados a esta seccion.
+                {% endif %}
+            </p>
+        </div><!-- div zonales -->
+      </div>
+    </div><!-- info contacto -->
+
+  </div><!-- div row -->
+</div><!-- tarjeta de contacto -->
+
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary my-2" data-bs-toggle="modal" data-bs-target="#modalRelacion">
+  Insertar Relacion
+</button>
+
+<!-- diagrama jerarquico -->
+<h5 class="text-center">Red de Alcance</h5>
+<div id="chart_div"></div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="modalRelacion" tabindex="-1" aria-labelledby="modalRelacion" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="modalRelacion">Insertar Relacion</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <!-- form para insertar contacto -->
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="id_user_master" value="{{ contacto.id }}">
+                    <div class="d-flex flex-row gap-1 mb-2">
+                        <input type="text" name="nombre" class="form-control" placeholder="Nombre(s)">
+                        <input type="text" name="apellido_paterno" class="form-control" placeholder="Apellido Paterno">
+                        <input type="text" name="apellido_materno" class="form-control" placeholder="Apellido Materno">
+                    </div>
+                    <input type="text" name="email" class="form-control mb-2" placeholder="E-Mail">
+                    <input type="text" name="telefono" class="form-control mb-2" placeholder="Telefono">
+                    <textarea name="domicilio" class="form-control mb-2" placeholder="Domicilio"></textarea>
+
+                    <!-- selector secciones -->
+                    {% if secciones %}
+                        <div class="d-flex flex-row">
+                            <p class="my-2 me-2">Seccion:</p>
+                            <div class="dropdown my-2">
+                                <button class="btn btn-dark dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Seleccionar seccion
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <div class="px-3 py-2">
+                                        <input type="text" class="form-control" id="myInput" placeholder="Buscar...">
+                                    </div>
+
+                                    {% for seccion in secciones %}
+                                        <li class="dropdown-item" data-value="{{ seccion.numero }}">
+                                            {% if seccion.numero > 0 %}
+                                                {{ seccion.numero }}
+                                            {% else %}
+                                                {{ seccion.nombre }}
+                                            {% endif%}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+
+                            <input type="hidden" name="seccion" id="inputSeccionSeleccionada" value="">
+                        </div>
+                    {% else %}
+                        <p class="m-2"><i>**No hay secciones registradas en el sistema.</i></p>
+                    {% endif %}
+                    
+                    <input type="submit" class="btn btn-primary" name="submitInsertarRelacion" value="Insertar">
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function(){
+    // Código para el filtro de texto
+    $("#myInput").on("keyup", function() {
+        var value = $(this).val().toLowerCase();
+        $(".dropdown-menu li").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    });
+
+    // Lógica para actualizar el botón y el campo oculto
+    $('.dropdown-menu li').on('click', function() {
+        var selectedText = $(this).text();
+        var selectedValue = $(this).data('value'); // Obtiene el valor del atributo 'data-value'
+
+        console.log(selectedValue);
+
+        // Actualiza el texto del botón
+        $('#dropdownMenuButton').text(selectedText);
+
+        // Actualiza el valor del campo oculto
+        $('#inputSeccionSeleccionada').val(selectedValue);
+
+        // Cierra el menú desplegable
+        $('.dropdown-menu').dropdown('hide');
+    });
+});
+</script>
+
+
+<script>
+      const apiUrl = "{{ api_url }}"; 
+      var urlNodo = "{% url 'contactos:mostrarPerfilContacto' id_contacto=0 %}";
+</script>
+
+<script type="text/javascript" src="{% static 'scripts/contactos/organigrama.js' %}"></script>
+
+{% endblock %}
