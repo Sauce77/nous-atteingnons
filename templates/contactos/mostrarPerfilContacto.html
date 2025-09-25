@@ -35,7 +35,7 @@
                 {% endif %}
             </p>
             <p><strong>Telefono:</strong>
-                {% if contacto.email %}
+                {% if contacto.telefono %}
                     {{ contacto.telefono }}
                 {% else %}
                     Telefono no disponible
@@ -43,26 +43,53 @@
             </p>
         </div><!-- div contacto -->
 
-        <p><strong>Domicilio: </strong>{{ contacto.domicilio }}</p>
-        
-        <p><strong>Seccion:</strong>
-            {% if contacto.seccion.numero > 0 %}
-                {{ contacto.seccion.numero }}
+        <p>
+            <strong>CURP: </strong>
+            {% if contacto.curp %}
+                {{ contacto.curp }}
             {% else %}
-                {{ contacto.seccion.nombre }}
+                No registrado
             {% endif %}
-        </p>
-        <div class="d-flex flex-row">
-            <p><strong>Zonales:</strong>
-                {% if contacto.seccion.zonales.all %}
-                    {% for zonal in contacto.seccion.zonales.all %}
-                        <p>{{ zonal.nombre }}</p>
-                    {% endfor %}
+        </p> <!-- curp -->
+
+        <p>
+            <strong>Clave Elector: </strong>
+            {% if contacto.clave_elector %}
+                {{ contacto.clave_elector }}
+            {% else %}
+                No registrado
+            {% endif %}
+        </p> <!-- clave elector -->
+
+        <p>
+            <strong>Domicilio: </strong>
+            {% if contacto.domicilio %}
+                {{ contacto.domicilio }}
+            {% else %}
+                No registrado.
+            {% endif %}
+        </p> <!-- domicilio -->
+        
+        {% if contacto.seccion.numero > 0 %}
+            <p><strong>Seccion:</strong>
+                {% if contacto.seccion.numero > 0 %}
+                    {{ contacto.seccion.numero }}
                 {% else %}
-                    No hay zonales asignados a esta seccion.
+                    {{ contacto.seccion.nombre }}
                 {% endif %}
             </p>
-        </div><!-- div zonales -->
+            <div class="d-flex flex-row">
+                <p><strong>Zonales:</strong>
+                    {% if contacto.seccion.zonales.all %}
+                        {% for zonal in contacto.seccion.zonales.all %}
+                            <p>{{ zonal.nombre }}</p>
+                        {% endfor %}
+                    {% else %}
+                        No hay zonales asignados a esta seccion.
+                    {% endif %}
+                </p>
+            </div><!-- div zonales -->
+        {% endif %}
 
         <div class="flex text-end">
             <button class="btn btn-secondary">
@@ -105,9 +132,30 @@
                         <input type="text" name="apellido_paterno" class="form-control" placeholder="Apellido Paterno">
                         <input type="text" name="apellido_materno" class="form-control" placeholder="Apellido Materno">
                     </div>
-                    <input type="text" name="email" class="form-control mb-2" placeholder="E-Mail">
-                    <input type="text" name="telefono" class="form-control mb-2" placeholder="Telefono">
-                    <textarea name="domicilio" class="form-control mb-2" placeholder="Domicilio"></textarea>
+                    <div class="form-floating">
+                        <input type="text" id="floatingEmail" name="email" class="form-control mb-2" placeholder="E-Mail">
+                        <label for="floatingEmail">Email</label>
+                    </div><!-- input email -->
+
+                    <div class="form-floating">
+                        <input type="text" id="floatingTelefono" name="telefono" class="form-control mb-2" placeholder="Telefono">
+                        <label for="floatingTelefono">Telefono</label>
+                    </div><!-- input telefono -->
+
+                    <div class="form-floating">
+                        <input type="text" id="floatingCurp" name="curp" class="form-control mb-2" placeholder="CURP">
+                        <label for="floatingCurp">CURP</label>
+                    </div><!-- input curp -->
+
+                    <div class="form-floating">
+                        <input type="text" id="floatingClaveElector" name="clave_elector" class="form-control mb-2" placeholder="Clave Elector">
+                        <label for="floatingClaveElector">Clave Elector</label>
+                    </div><!-- input clave elector -->
+                    
+                    <div class="form-floating">
+                        <textarea type="text" id="floatingDomicilio" name="domicilio" class="form-control mb-2" placeholder="Domicilio"></textarea>
+                        <label for="floatingDomicilio">Domicilio</label>
+                    </div><!-- input domicilio -->
 
                     <!-- selector secciones -->
                     {% if secciones %}

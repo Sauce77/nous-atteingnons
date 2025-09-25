@@ -44,8 +44,8 @@ class Contacto(MPTTModel):
     telefono = models.CharField(max_length=10, null=True, blank=True)
     email = models.CharField(max_length=150, null=True, blank=True)
     domicilio = models.TextField(null=True, blank=True)
-    curp = models.CharField(max_length=18, blank=True, unique=True)
-    clave_elector = models.CharField(max_length=13, blank=True, unique=True)
+    curp = models.CharField(max_length=18, blank=True, null=True)
+    clave_elector = models.CharField(max_length=13, blank=True, null=True)
     estatus = models.CharField(max_length=1, choices=ESTATUS_CHOICES, default='A')
     
     seccion = models.ForeignKey(Seccion, on_delete=models.SET_NULL, null=True, blank=True)

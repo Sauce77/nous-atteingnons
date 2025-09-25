@@ -50,6 +50,10 @@ def editarContacto(request, id_contacto):
             email = request.POST.get('email')
             # obtenemos telefono del contacto
             telefono = request.POST.get('telefono')
+            # obtenemos telefono del contacto
+            curp = request.POST.get('curp')
+            # obtenemos telefono del contacto
+            clave_elector = request.POST.get('clave_elector')
             # obtenemos domicilio del contacto
             domicilio = request.POST.get('domicilio')
 
@@ -57,6 +61,18 @@ def editarContacto(request, id_contacto):
             numero_seccion = request.POST.get('seccion')
             # obtenemos id del contacto asociado
             numero_contacto_asociado = request.POST.get('padre')
+
+            # revisamos que numero de seccion sea un numero
+            try:
+                numero_seccion = int(numero_seccion)
+            except ValueError:
+                numero_seccion = -1
+
+            # convertimos CURP a mayusculas
+            curp = curp.upper()
+
+            # convertimos clave de elector a mayusculas
+            clave_elector = clave_elector.upper()
 
             # obtenemos seccion del contacto
             try:
@@ -106,6 +122,8 @@ def editarContacto(request, id_contacto):
                 contacto.apellido_materno=apellido_materno
                 contacto.email=email
                 contacto.telefono=telefono
+                contacto.curp = curp
+                contacto.clave_elector = clave_elector
                 contacto.domicilio=domicilio
                 contacto.seccion=seccion
                 contacto.parent=contacto_asociado
@@ -166,11 +184,28 @@ def mostrarPerfilContacto(request, id_contacto):
             email = request.POST.get('email')
             # obtenemos telefono del contacto
             telefono = request.POST.get('telefono')
+            # obtenemos telefono del contacto
+            curp = request.POST.get('curp')
+            # obtenemos telefono del contacto
+            clave_elector = request.POST.get('clave_elector')
             # obtenemos domicilio del contacto
             domicilio = request.POST.get('domicilio')
 
             # obtenemos numero_seccion del contacto
             numero_seccion = request.POST.get('seccion')
+
+            # revisamos que numero de seccion sea un numero
+            try:
+                numero_seccion = int(numero_seccion)
+            except ValueError:
+                numero_seccion = -1
+
+            # convertimos CURP a mayusculas
+            curp = curp.upper()
+
+            # convertimos clave de elector a mayusculas
+            clave_elector = clave_elector.upper()
+            
             # obtenemos seccion del contacto
             try:
                 seccion = Seccion.objects.get(numero=numero_seccion)
@@ -181,11 +216,24 @@ def mostrarPerfilContacto(request, id_contacto):
                 }
                 return render(request, "core/error.html", contexto)
 
-            # filtramos contactos por seccion y apellido paterno (sin considerar mayusculas)
-            contactos_repetidos = Contacto.objects.filter(seccion=seccion).filter(apellido_paterno__iexact=apellido_paterno)
+            # filtramos contactos apellido paterno (sin considerar mayusculas)
+            contactos_repetidos = Contacto.objects.filter(apellido_paterno__iexact=apellido_paterno)
             # filtramos contactos por nombre (sin considerar mayusculas) y apellido materno (sin considerar mayusculas)
             contactos_repetidos = contactos_repetidos.filter(nombre__iexact=nombre).filter(apellido_materno__iexact=apellido_materno)
+            # filtramos por telefono
+            if telefono:
+                # si el form incluye telefono
+                contactos_repetidos = contactos_repetidos.filter(telefono__iexact=telefono)
 
+            # filtramos por curp y clave de elector
+            if curp:
+                # si el form incluye curp
+                contactos_repetidos = contactos_repetidos.filter(curp__iexact=curp)
+
+            if curp:
+                # si el form incluye clave de elector
+                contactos_repetidos = contactos_repetidos.filter(clave_elector__iexact=clave_elector)
+            
             if contactos_repetidos:
                 contexto = {
                     "titulo": "El contacto a insertar, ya existe.",
@@ -195,18 +243,29 @@ def mostrarPerfilContacto(request, id_contacto):
                 return render(request, "core/error.html", contexto)
             
             else:
-                # si no creamos un nuevo contacto
-                nuevo_contacto = Contacto.objects.create(
-                    nombre=nombre,
-                    apellido_paterno=apellido_paterno,
-                    apellido_materno=apellido_materno,
-                    email=email,
-                    telefono=telefono,
-                    domicilio=domicilio,
-                    seccion=seccion,
-                    parent=contacto
-                )
-                nuevo_contacto.save()
+
+                try:
+                    # si no creamos un nuevo contacto
+                    nuevo_contacto = Contacto.objects.create(
+                        nombre=nombre,
+                        apellido_paterno=apellido_paterno,
+                        apellido_materno=apellido_materno,
+                        email=email,
+                        telefono=telefono,
+                        curp=curp,
+                        clave_elector=clave_elector,
+                        domicilio=domicilio,
+                        seccion=seccion,
+                        parent=contacto
+                    )
+                    nuevo_contacto.save()
+                except Exception as e:
+                    contexto = {
+                    "titulo": "Error al insertar nuevo contacto.",
+                    "descripcion": e
+                }
+                # si existen contactos repetidos redirigir
+                return render(request, "core/error.html", contexto)
             
     contexto = {
         "contacto": contacto,

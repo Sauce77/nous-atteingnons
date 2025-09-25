@@ -48,9 +48,47 @@
                 <input type="text" name="apellido_paterno" class="form-control" placeholder="Apellido Paterno" value="{{ contacto.apellido_paterno }}">
                 <input type="text" name="apellido_materno" class="form-control" placeholder="Apellido Materno" value="{{ contacto.apellido_materno }}">
             </div>
-            <input type="text" name="email" class="form-control mb-2" placeholder="E-Mail" value="{{ contacto.email }}">
-            <input type="text" name="telefono" class="form-control mb-2" placeholder="Telefono" value="{{ contacto.telefono }}">
-            <textarea name="domicilio" class="form-control mb-2" placeholder="Domicilio">{{ contacto.domicilio }}</textarea>
+
+            <div class="form-floating">
+                <input type="text" id="floatingEmail" name="email" class="form-control mb-2" placeholder="E-Mail"
+                {% if contacto.email %}
+                    value="{{ contacto.email }}"
+                {% endif %}
+                >
+                <label for="floatingEmail">Email</label>
+            </div><!-- input email -->
+
+            <div class="form-floating">
+                <input type="text" id="floatingTelefono" name="telefono" class="form-control mb-2" placeholder="Telefono"
+                {% if contacto.telefono %}
+                    value="{{ contacto.telefono }}"
+                {% endif %}
+                >
+                <label for="floatingTelefono">Telefono</label>
+            </div><!-- input telefono -->
+
+            <div class="form-floating">
+                <input type="text" id="floatingCurp" name="curp" class="form-control mb-2" placeholder="CURP"
+                {% if contacto.curp %}
+                    value="{{ contacto.curp }}"
+                {% endif %}
+                >
+                <label for="floatingCurp">CURP</label>
+            </div><!-- input curp -->
+
+            <div class="form-floating">
+                <input type="text" id="floatingClaveElector" name="clave_elector" class="form-control mb-2" placeholder="Clave Elector"
+                {% if contacto.clave_elector %}
+                    value="{{ contacto.clave_elector }}"
+                {% endif %}
+                >
+                <label for="floatingClaveElector">Clave Elector</label>
+            </div><!-- input clave elector -->
+            
+            <div class="form-floating">
+                <textarea type="text" id="floatingDomicilio" name="domicilio" class="form-control mb-2" placeholder="Domicilio">{% if contacto.domicilio %}{{ contacto.domicilio }}{% endif %}</textarea>
+                <label for="floatingDomicilio">Domicilio</label>
+            </div><!-- input domicilio -->
 
             <!-- selector secciones -->
             {% if secciones %}

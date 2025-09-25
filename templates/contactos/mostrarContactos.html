@@ -6,23 +6,18 @@
 <table id="tablaContactos" class="table table-hover">
     <thead class="table-dark">
         <tr>
-            <th>Seccion</th>
             <th>Apellido Paterno</th>
             <th>Apellido Materno</th>
             <th>Nombre</th>
             <th>Telefono</th>
             <th>Email</th>
+            <th>CURP</th>
+            <th>Clave Elector</th>
         </tr>
     </thead>
     <tbody>
         {% for contacto in contactos %}
             <tr data-href="{% url 'contactos:mostrarPerfilContacto' id_contacto=contacto.id %}">
-                {% if contacto.seccion.numero > 0 %}
-                    <td>{{ contacto.seccion.numero }}</td>
-                {% else %}
-                    <td>{{ contacto.seccion.nombre }}</td>
-                {% endif %}
-
                 <td>{{ contacto.apellido_paterno }}</td>
                 <td>{{ contacto.apellido_materno }}</td>
                 <td>{{ contacto.nombre }}</td>
@@ -36,6 +31,18 @@
                     <td>{{ contacto.email }}</td>
                 {% else %}
                     <td>Sin Email</td>
+                {% endif %}
+
+                {% if contacto.curp %}
+                    <td>{{ contacto.curp }}</td>
+                {% else %}
+                    <td>No Registrada</td>
+                {% endif %}
+
+                {% if contacto.clave_elector %}
+                    <td>{{ contacto.clave_elector }}</td>
+                {% else %}
+                    <td>No Registrada</td>
                 {% endif %}
             </tr>
         {% endfor %}
