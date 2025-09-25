@@ -35,3 +35,38 @@ class ContactoSerializer(serializers.ModelSerializer):
     def get_descendant_count(self, obj):
         # Utiliza el método de MPTT para obtener el conteo de descendientes
         return obj.get_descendant_count()
+    
+
+class ContactSerializer(serializers.ModelSerializer):
+    descendant_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Contacto
+        fields = ('id', 
+                  'nombre', 
+                  'apellido_paterno', 
+                  'apellido_materno',
+                  'descendant_count')
+        
+    def get_descendant_count(self, obj):
+        # `obj` is the current Contacto instance being serialized
+        # `get_descendant_count()` is an MPTT method
+        return obj.get_descendant_count()
+
+class ContactWithChildrenSerializer(serializers.ModelSerializer):
+    children = ContactSerializer(many=True, read_only=True)
+    descendant_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Contacto
+        fields = ('id', 
+                  'nombre', 
+                  'apellido_paterno', 
+                  'apellido_materno',
+                  'descendant_count',
+                  'children')
+    
+    def get_descendant_count(self, obj):
+        # `obj` is the current Contacto instance being serialized
+        # `get_descendant_count()` is an MPTT method
+        return obj.get_descendant_count()

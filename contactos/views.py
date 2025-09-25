@@ -145,7 +145,7 @@ def mostrarPerfilContacto(request, id_contacto):
         return render(request, "core/error.html", contexto)
     
     # obtenemos url para serializador del arbol
-    api_url = reverse('api:mostrarSubArbol', args=[contacto.pk])
+    api_url = reverse('api:mostrarRelaciones', args=[contacto.pk])
 
     # obtenemos todas las secciones
     secciones = Seccion.objects.all()
