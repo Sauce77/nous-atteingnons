@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
+from django.contrib import messages
 
 
 from .models import Contacto, Seccion
@@ -14,6 +15,7 @@ def mostrarContactos(request):
     contactos = Contacto.objects.all()
 
     contexto = {
+        "titulo": "Contactos",
         "contactos": contactos,
     }
 
@@ -234,13 +236,15 @@ def mostrarPerfilContacto(request, id_contacto):
                 # si el form incluye clave de elector
                 contactos_repetidos = contactos_repetidos.filter(clave_elector__iexact=clave_elector)
             
-            if contactos_repetidos:
+            if contactos_repetidos.exists():
                 contexto = {
-                    "titulo": "El contacto a insertar, ya existe.",
-                    "descripcion": "Se ha encontrado un contacto que coincide en seccion, nombre y apellidos."
+                    "titulo": "Contactos identicos",
+                    "contactos": contactos_repetidos
                 }
+
+                messages.warning(request, "Se encontraron contactos con concidencias en la informacion ingresada.")
                 # si existen contactos repetidos redirigir
-                return render(request, "core/error.html", contexto)
+                return render(request, "contactos/mostrarContactos.html", contexto)
             
             else:
 
@@ -261,11 +265,11 @@ def mostrarPerfilContacto(request, id_contacto):
                     nuevo_contacto.save()
                 except Exception as e:
                     contexto = {
-                    "titulo": "Error al insertar nuevo contacto.",
-                    "descripcion": e
-                }
-                # si existen contactos repetidos redirigir
-                return render(request, "core/error.html", contexto)
+                        "titulo": "Error al insertar nuevo contacto.",
+                        "descripcion": e
+                    }
+                    # si existe error al crear un contacto
+                    return render(request, "core/error.html", contexto)
             
     contexto = {
         "contacto": contacto,
@@ -274,3 +278,4 @@ def mostrarPerfilContacto(request, id_contacto):
     }
 
     return render(request, "contactos/mostrarPerfilContacto.html", contexto)
+
