@@ -27,7 +27,15 @@ def editarContacto(request, id_contacto):
     """
         Permite modificar la informacion y la relacion de un contacto seleccionado.
     """
+
+    # obtenemos el contacto
     contacto = get_object_or_404(Contacto, pk=id_contacto)
+
+    # obtenemos secciones
+    secciones = Seccion.objects.all()
+
+    # obtenemos contactos
+    contactos = Contacto.objects.all()
     
     # logica post form
     if request.method == "POST":
@@ -90,34 +98,32 @@ def editarContacto(request, id_contacto):
                     contexto = {
                         "titulo": "Contactos identicos",
                         "contactos": coincidencias,
-                        "contacto": contacto
+                        "opciones_contactos": contactos,
+                        "opciones_secciones": secciones,
+                        "contacto": contacto,
+                        "form": form,
+                        "modoForm": "Editar",
                     }
 
                     messages.warning(request, "Se encontraron contactos con coincidencias en la informacion ingresada.")
                     # si existen contactos repetidos redirigir
-                    return render(request, "contactos/mostrarContactos.html", contexto)
+                    return render(request, "contactos/mostrarDuplicados.html", contexto)
                 
                 else:
                     # guardamos los cambios realizados
                     form.save()
                     messages.info(request, f"La informacion de {contacto.apellido_paterno} {contacto.apellido_materno}, {contacto.nombre} ha sido modificada.")
-            
+                    return redirect("contactos:mostrarPerfilContacto", id_contacto=contacto.pk)
             else:
                 messages.error(request, "Informacion ingresada fue invalidada. Intente de nuevo.")
 
     else:
         form = ContactoForm(instance=contacto)
 
-    # obtenemos secciones
-    secciones = Seccion.objects.all()
-
-    # obtenemos contactos
-    contactos = Contacto.objects.all()
-
     contexto = {
         "contacto": contacto,
-        "secciones": secciones,
-        "contactos": contactos,
+        "opciones_secciones": secciones,
+        "opciones_contactos": contactos,
         "form": form,
         "modoForm": "Editar",
     }
@@ -129,21 +135,15 @@ def mostrarPerfilContacto(request, id_contacto):
         Muestra la informacion de contacto y sus relaciones.
     """
 
-    try:
-        # obtenemos objeto del usuario seleccionado
-        contacto = Contacto.objects.get(pk=id_contacto)
-    except Contacto.DoesNotExist:
-        contexto = {
-            "titulo": "Contacto no encontrado.",
-            "descripcion": "El contacto seleccionado no pudo ser encontrado en los registros."
-        }
-        return render(request, "core/error.html", contexto)
+    # obtenemos el contacto
+    contacto = get_object_or_404(Contacto, pk=id_contacto)
+
+    # obtenemos secciones
+    secciones = Seccion.objects.all()
     
     # obtenemos url para serializador del arbol
     api_url = reverse('api:mostrarRelaciones', args=[contacto.pk])
 
-    # obtenemos todas las secciones
-    secciones = Seccion.objects.all()
 
     # logica post form
     if request.method == "POST":
@@ -191,12 +191,15 @@ def mostrarPerfilContacto(request, id_contacto):
                     contexto = {
                         "titulo": "Contactos identicos",
                         "contactos": coincidencias,
-                        "contacto": nuevo_contacto
+                        "secciones": secciones,
+                        "contacto": nuevo_contacto,
+                        "form": form,
+                        "modoForm": "Insertar",
                     }
 
                     messages.warning(request, "Se encontraron contactos con coincidencias en la informacion ingresada.")
                     # si existen contactos repetidos redirigir
-                    return render(request, "contactos/mostrarContactos.html", contexto)
+                    return render(request, "contactos/mostrarDuplicados.html", contexto)
                 
                 else:
                     try:
@@ -204,6 +207,7 @@ def mostrarPerfilContacto(request, id_contacto):
                         nuevo_contacto.save()
                         # enviamos un mensaje
                         messages.success(request, f"¡{nuevo_contacto.apellido_paterno} {nuevo_contacto.apellido_materno}, {nuevo_contacto.nombre} ingresado a la red!")
+                        return redirect("contactos:mostrarPerfilContacto", id_contacto=contacto.pk)
                     except Exception as e:
                         messages.error(request, "Error al guardar contacto:", e)
             else:
@@ -215,7 +219,7 @@ def mostrarPerfilContacto(request, id_contacto):
     contexto = {
         "contacto": contacto,
         "alcance_contactos": contacto.get_descendant_count(),
-        "secciones": secciones,
+        "opciones_secciones": secciones,
         "form": form,
         "modoForm": "Insertar",
         "api_url": api_url

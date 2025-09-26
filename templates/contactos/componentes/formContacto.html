@@ -6,9 +6,9 @@
     {% if modoForm == "Editar" and contacto.parent %}
 
         <!-- selector contacto asociado -->
-        {% if contactos %}
+        {% if opciones_contactos %}
 
-            <div class="d-flex flex-row" id="divDropdownPadre">
+            <div class="d-flex flex-fill" id="divDropdownPadre">
                 <p class="my-2 me-2">Contacto asociado:</p>
                 <div class="dropdown my-2">
                     <button class="btn btn-dark dropdown-toggle" type="button" id="dropdownPadreButton" data-bs-toggle="dropdown" aria-expanded="false">
@@ -19,7 +19,7 @@
                             <input type="text" class="form-control" id="buscarPadre" placeholder="Buscar...">
                         </div>
 
-                        {% for aux_contacto in contactos %}
+                        {% for aux_contacto in opciones_contactos %}
                             {% if aux_contacto.id != contacto.id %}
                                 <li class="dropdown-item" data-value="{{ aux_contacto.id }}">
                                     <strong>{{ aux_contacto.seccion.numero }}:</strong> {{ aux_contacto.apellido_paterno }} {{ aux_contacto.apellido_materno }} {{ aux_contacto.nombre }}
@@ -85,8 +85,8 @@
     </div><!-- input domicilio -->
 
     <!-- selector secciones -->
-    {% if secciones %}
-        <div class="d-flex flex-row" id="divDropdownSeccion">
+    {% if opciones_secciones %}
+        <div class="d-flex flex-fill" id="divDropdownSeccion">
             <p class="my-2 me-2">Seccion:</p>
             <div class="dropdown my-2">
                 <button class="btn btn-dark dropdown-toggle" type="button" id="dropdownSeccionButton" data-bs-toggle="dropdown" aria-expanded="false">
@@ -101,7 +101,7 @@
                         <input type="text" class="form-control" id="buscarSeccion" placeholder="Buscar...">
                     </div>
 
-                    {% for seccion in secciones %}
+                    {% for seccion in opciones_secciones %}
                         <li class="dropdown-item" data-value="{{ seccion.numero }}">
                             {% if seccion.numero > 0 %}
                                 {{ seccion.numero }}
@@ -119,14 +119,18 @@
         <p class="m-2"><i>**No hay secciones registradas en el sistema.</i></p>
     {% endif %}
 
-    <div class="d-flex gap-2">
+    <div class="d-flex gap-2 mt-2">
         {% if modoForm == "Editar" %}
             <input type="submit" class="btn btn-primary flex-fill" name="submitGuardar" value="Guardar">
         {% elif modoForm == "Insertar" %}
             <input type="submit" class="btn btn-primary flex-fill" name="submitInsertarRelacion" value="Insertar">
         {% endif %}
 
-        <a href="{% url 'contactos:mostrarPerfilContacto' id_contacto=contacto.pk %}" class="btn btn-danger flex-fill text-decoration-none text-white ">Cancelar</a>
+        {% if contacto.pk %}
+            <a href="{% url 'contactos:mostrarPerfilContacto' id_contacto=contacto.pk %}" class="btn btn-danger flex-fill text-decoration-none text-white ">Cancelar</a>
+        {% else %}
+            <a href="{% url 'contactos:mostrarContactos' %}" class="btn btn-danger flex-fill text-decoration-none text-white ">Cancelar</a>
+        {% endif %}
     </div>
     
 </form>
