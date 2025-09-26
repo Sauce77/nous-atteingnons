@@ -23,7 +23,7 @@ class Seccion(models.Model):
     rentabilidad = models.FloatField(null=True, blank=True)
     comentarios = models.TextField(null=True, blank=True)
 
-    zonales = models.ManyToManyField(Zonal, null=True, blank=True)
+    zonales = models.ManyToManyField(Zonal)
 
     def __str__(self):
         return str(self.numero)
@@ -41,11 +41,13 @@ class Contacto(MPTTModel):
     nombre = models.CharField(max_length=150, null=False, blank=False)
     apellido_paterno = models.CharField(max_length=150, null=False, blank=False)
     apellido_materno = models.CharField(max_length=150, null=False, blank=False)
+    fecha_nacimiento = models.DateField(null=True, blank=True)
     telefono = models.CharField(max_length=10, null=True, blank=True)
-    email = models.CharField(max_length=150, null=True, blank=True)
+    email = models.EmailField(max_length=254, null=True, blank=True)
     domicilio = models.TextField(null=True, blank=True)
     curp = models.CharField(max_length=18, blank=True, null=True)
     clave_elector = models.CharField(max_length=13, blank=True, null=True)
+
     estatus = models.CharField(max_length=1, choices=ESTATUS_CHOICES, default='A')
     
     seccion = models.ForeignKey(Seccion, on_delete=models.SET_NULL, null=True, blank=True)

@@ -4,6 +4,7 @@ from django.contrib import messages
 
 
 from .models import Contacto, Seccion
+from .forms import ContactoForm
 # Create your views here.
 
 def mostrarContactos(request):
@@ -133,7 +134,9 @@ def editarContacto(request, id_contacto):
                 contacto.save()
 
                 return redirect('contactos:mostrarPerfilContacto', id_contacto=contacto.id)
-            
+    
+    else:
+        form = ContactoForm()
 
     # obtenemos secciones
     secciones = Seccion.objects.all()
@@ -145,6 +148,7 @@ def editarContacto(request, id_contacto):
         "contacto": contacto,
         "secciones": secciones,
         "contactos": contactos,
+        "form": form,
     }
 
     return render(request, "contactos/editarContacto.html", contexto)
@@ -270,10 +274,13 @@ def mostrarPerfilContacto(request, id_contacto):
                     }
                     # si existe error al crear un contacto
                     return render(request, "core/error.html", contexto)
-            
+    else:
+        form = ContactoForm()
+
     contexto = {
         "contacto": contacto,
         "secciones": secciones,
+        "form": form,
         "api_url": api_url
     }
 

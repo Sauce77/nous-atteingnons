@@ -122,39 +122,53 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-
                 <!-- form para insertar contacto -->
+
+                {{ form.errors }}
+
                 <form method="post">
                     {% csrf_token %}
                     <input type="hidden" name="id_user_master" value="{{ contacto.id }}">
-                    <div class="d-flex flex-row gap-1 mb-2">
-                        <input type="text" name="nombre" class="form-control" placeholder="Nombre(s)">
-                        <input type="text" name="apellido_paterno" class="form-control" placeholder="Apellido Paterno">
-                        <input type="text" name="apellido_materno" class="form-control" placeholder="Apellido Materno">
-                    </div>
+                    
                     <div class="form-floating">
-                        <input type="text" id="floatingEmail" name="email" class="form-control mb-2" placeholder="E-Mail">
-                        <label for="floatingEmail">Email</label>
+                        {{ form.nombre }}
+                        <label for="{{ form.nombre.id_for_label }}">Nombre(s)</label>
+                    </div><!-- input nombre -->
+
+                    <div class="d-flex flex-row gap-1 mb-2">
+                        <div class="form-floating">
+                            {{ form.apellido_paterno }}
+                            <label for="{{ form.apellido_paterno.id_for_label }}">Apellido Paterno</label>
+                        </div><!-- input apellido paterno -->
+                       <div class="form-floating">
+                            {{ form.apellido_materno }}
+                            <label for="{{ form.apellido_materno.id_for_label }}">Apellido Materno</label>
+                        </div><!-- input apellido materno -->
+                    </div>
+
+                    <div class="form-floating">
+                        {{ form.email }}
+                        <label for="{{ form.email.id_for_label }}">Email</label>
                     </div><!-- input email -->
 
                     <div class="form-floating">
-                        <input type="text" id="floatingTelefono" name="telefono" class="form-control mb-2" placeholder="Telefono">
-                        <label for="floatingTelefono">Telefono</label>
+                        {{ form.telefono }}
+                        <label for="{{ form.telefono.id_for_label}}">Telefono</label>
                     </div><!-- input telefono -->
 
                     <div class="form-floating">
-                        <input type="text" id="floatingCurp" name="curp" class="form-control mb-2" placeholder="CURP">
-                        <label for="floatingCurp">CURP</label>
+                        {{ form.curp }}
+                        <label for="{{ form.curp.id_for_label }}">CURP</label>
                     </div><!-- input curp -->
 
                     <div class="form-floating">
-                        <input type="text" id="floatingClaveElector" name="clave_elector" class="form-control mb-2" placeholder="Clave Elector">
-                        <label for="floatingClaveElector">Clave Elector</label>
+                        {{ form.clave_elector }}
+                        <label for="{{ form.clave_elector.id_for_label }}">Clave Elector</label>
                     </div><!-- input clave elector -->
                     
                     <div class="form-floating">
-                        <textarea type="text" id="floatingDomicilio" name="domicilio" class="form-control mb-2" placeholder="Domicilio"></textarea>
-                        <label for="floatingDomicilio">Domicilio</label>
+                        {{ form.domicilio }}
+                        <label for="{{ form.domicilio.id_for_label }}">Domicilio</label>
                     </div><!-- input domicilio -->
 
                     <!-- selector secciones -->
