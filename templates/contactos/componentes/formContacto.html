@@ -3,7 +3,7 @@
 <form method="post">
     {% csrf_token %}
 
-    {% if modoForm == "Editar" %}
+    {% if modoForm == "Editar" and contacto.parent %}
 
         <!-- selector contacto asociado -->
         {% if contactos %}
@@ -12,11 +12,7 @@
                 <p class="my-2 me-2">Contacto asociado:</p>
                 <div class="dropdown my-2">
                     <button class="btn btn-dark dropdown-toggle" type="button" id="dropdownPadreButton" data-bs-toggle="dropdown" aria-expanded="false">
-                        {% if contacto.parent %}
-                            <strong>{{ contacto.parent.seccion.numero }}:</strong> {{ contacto.parent.apellido_paterno }} {{ contacto.parent.apellido_materno }} {{ contacto.parent.nombre }} 
-                        {% else %}
-                            Sin contacto asociado
-                        {% endif %}
+                        <strong>{{ contacto.parent.seccion.numero }}:</strong> {{ contacto.parent.apellido_paterno }} {{ contacto.parent.apellido_materno }} {{ contacto.parent.nombre }} 
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="dropdownPadreButton">
                         <div class="px-3 py-2">
@@ -40,9 +36,9 @@
         {% endif %}
         <hr><!-- fin editar relacion-->
 
-        {% else %}
-            <input type="hidden" name="id_user_master" value="{{ contacto.id }}">
-        {% endif %}
+    {% else %}
+        <input type="hidden" name="id_user_master" value="{{ contacto.id }}">
+    {% endif %}
 
 
     

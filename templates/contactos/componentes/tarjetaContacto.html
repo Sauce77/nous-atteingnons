@@ -91,9 +91,7 @@
         {% endif %}
 
         <div class="flex text-end">
-            <button class="btn btn-secondary">
-                <a href="{% url 'contactos:editarContacto' id_contacto=contacto.pk %}" class="text-decoration-none text-white">Editar</a>
-            </button>
+            <a href="{% url 'contactos:editarContacto' id_contacto=contacto.pk %}" class="btn btn-secondary text-decoration-none text-white">Editar</a>
         </div>
 
       </div>
