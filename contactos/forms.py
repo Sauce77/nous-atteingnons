@@ -1,5 +1,30 @@
 from django import forms
+from django_select2 import forms as s2forms
+
 from .models import Contacto
+
+
+class ContactoAsociadoWidget(s2forms.ModelSelect2Widget):
+    """
+        Anade un buscador y select para el modelo Contacto.
+    """
+    search_fields = [
+        "nombre__icontains",
+        "apellido_paterno__icontains",
+        "apellido_materno__icontains",
+        "curp__icontains",
+        "clave_elector__icontains",
+        "telefono__icontains",
+    ]
+
+class SeccionWidget(s2forms.ModelSelect2Widget):
+    """
+        Anade un buscador y select para el modelo Seccion.
+    """
+    search_fields = [
+        "numero__icontains",
+        "nombre__icontains",
+    ]
 
 class ContactoForm(forms.ModelForm):
     """
@@ -8,6 +33,7 @@ class ContactoForm(forms.ModelForm):
     class Meta:
         model = Contacto
         exclude = ['estatus']
+
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control mb-2', 'placeholder': 'Nombre(s)'}),
             'apellido_paterno': forms.TextInput(attrs={'class': 'form-control mb-2', 'placeholder': 'Apellido Paterno'}),
@@ -17,4 +43,6 @@ class ContactoForm(forms.ModelForm):
             'domicilio': forms.Textarea(attrs={'class': 'form-control mb-2', 'placeholder': 'Domicilio'}),
             'curp': forms.TextInput(attrs={'class': 'form-control mb-2', 'placeholder': 'CURP'}),
             'clave_elector': forms.TextInput(attrs={'class': 'form-control mb-2', 'placeholder': 'Clave Elector'}),
+            'seccion': SeccionWidget,
+            'parent': ContactoAsociadoWidget,
         }

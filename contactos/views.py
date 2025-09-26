@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
 from django.urls import reverse
 from django.contrib import messages
 
-from scripts.validacionesContactos import existenCoincidencias, filtrarContactosDuplicados
+from scripts.validacionesContactos import filtrarContactosDuplicados
 
 from .models import Contacto, Seccion
 from .forms import ContactoForm
@@ -94,7 +94,7 @@ def editarContacto(request, id_contacto):
 
                 # ------------------- CONTACTOS REPETIDOS -----------------------------
                 
-                if existenCoincidencias(contacto):
+                if contacto:
                     # si existe una coincidencia
                     messages.warning(request, "Se encontraron contactos con coincidencias en la informacion ingresada.")
                     # guardamos la informacion en la sesion
