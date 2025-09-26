@@ -1,8 +1,8 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
 from django.urls import reverse
 from django.contrib import messages
 
-from scripts.validacionesContactos import filtrarContactosDuplicados
+from scripts.validacionesContactos import existenCoincidencias, filtrarContactosDuplicados
 
 from .models import Contacto, Seccion
 from .forms import ContactoForm
@@ -61,6 +61,10 @@ def editarContacto(request, id_contacto):
                     # convertimos clave de elector a mayusculas
                     contacto.clave_elector = contacto.clave_elector.upper()
 
+                
+                # serializamo
+                contacto_cleaned_data = form.cleaned_data
+
                 # obtenemos numero_seccion del contacto
                 numero_seccion = request.POST.get('seccion')
                 
@@ -87,27 +91,16 @@ def editarContacto(request, id_contacto):
                 # asignamos la seccion al contacto
                 contacto.parent = contacto_asociado
 
+
                 # ------------------- CONTACTOS REPETIDOS -----------------------------
-
-                coincidencias = filtrarContactosDuplicados(contacto)
-
-                # excluimos el usuario a editar
-                coincidencias = coincidencias.exclude(pk=contacto.id)
                 
-                if coincidencias.exists():
-                    contexto = {
-                        "titulo": "Contactos identicos",
-                        "contactos": coincidencias,
-                        "opciones_contactos": contactos,
-                        "opciones_secciones": secciones,
-                        "contacto": contacto,
-                        "form": form,
-                        "modoForm": "Editar",
-                    }
-
+                if existenCoincidencias(contacto):
+                    # si existe una coincidencia
                     messages.warning(request, "Se encontraron contactos con coincidencias en la informacion ingresada.")
-                    # si existen contactos repetidos redirigir
-                    return render(request, "contactos/mostrarDuplicados.html", contexto)
+                    # guardamos la informacion en la sesion
+                    request.session['datos_contacto'] = contacto_cleaned_data
+                    # si existen contactos repetidos redirigir a manejarDuplicados
+                    return redirect("contactos:manejarDuplicados")
                 
                 else:
                     # guardamos los cambios realizados
@@ -191,10 +184,10 @@ def mostrarPerfilContacto(request, id_contacto):
                     contexto = {
                         "titulo": "Contactos identicos",
                         "contactos": coincidencias,
-                        "secciones": secciones,
+                        "opciones_secciones": secciones,
                         "contacto": nuevo_contacto,
                         "form": form,
-                        "modoForm": "Insertar",
+                        "modoForm": "Duplicado",
                     }
 
                     messages.warning(request, "Se encontraron contactos con coincidencias en la informacion ingresada.")
@@ -212,8 +205,9 @@ def mostrarPerfilContacto(request, id_contacto):
                         messages.error(request, "Error al guardar contacto:", e)
             else:
                 messages.error(request, "Informacion ingresada fue invalidada. Intente de nuevo.")
-                
+
     else:
+        # si no hay peticion POST
         form = ContactoForm()
 
     contexto = {
@@ -226,4 +220,14 @@ def mostrarPerfilContacto(request, id_contacto):
     }
 
     return render(request, "contactos/mostrarPerfilContacto.html", contexto)
+
+
+def manejarDuplicado(request):
+    """
+        Al encontrar un registro con coincidencias, esta vista permite corregir
+        la informacion ingresada para evitar duplicados.
+    """
+
+    # obtenemos los datos del contacto
+    datos_contacto = request.session.get('datos_contacto')
 

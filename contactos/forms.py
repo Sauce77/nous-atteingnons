@@ -7,7 +7,7 @@ class ContactoForm(forms.ModelForm):
     """
     class Meta:
         model = Contacto
-        exclude = ['fecha_nacimiento', 'estatus', 'seccion', 'parent']
+        exclude = ['estatus']
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control mb-2', 'placeholder': 'Nombre(s)'}),
             'apellido_paterno': forms.TextInput(attrs={'class': 'form-control mb-2', 'placeholder': 'Apellido Paterno'}),
