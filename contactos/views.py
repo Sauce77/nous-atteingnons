@@ -180,105 +180,93 @@ def mostrarPerfilContacto(request, id_contacto):
         submitInsertarRelacion = request.POST.get('submitInsertarRelacion')
         # si el valor es "Insertar"
         if submitInsertarRelacion == "Insertar":
-            # obtenemos nombre del contacto
-            nombre = request.POST.get('nombre')
-            # obtenemos apellido paterno del contacto
-            apellido_paterno = request.POST.get('apellido_paterno')
-            # obtenemos apellido materno del contacto
-            apellido_materno = request.POST.get('apellido_materno')
-            # obtenemos email del contacto
-            email = request.POST.get('email')
-            # obtenemos telefono del contacto
-            telefono = request.POST.get('telefono')
-            # obtenemos telefono del contacto
-            curp = request.POST.get('curp')
-            # obtenemos telefono del contacto
-            clave_elector = request.POST.get('clave_elector')
-            # obtenemos domicilio del contacto
-            domicilio = request.POST.get('domicilio')
 
-            # obtenemos numero_seccion del contacto
-            numero_seccion = request.POST.get('seccion')
+            # obtenemos los datos del form de la peticion POST
+            form = ContactoForm(request.POST)
 
-            # revisamos que numero de seccion sea un numero
-            try:
-                numero_seccion = int(numero_seccion)
-            except ValueError:
-                numero_seccion = -1
+            if form.is_valid():
+                # si los campos del form son correctos
+                # alamacena la respuesta en una instancia provisional
+                nuevo_contacto = form.save(commit=False)
 
-            # convertimos CURP a mayusculas
-            curp = curp.upper()
+                # asignamos la relacion
+                nuevo_contacto.parent = contacto
 
-            # convertimos clave de elector a mayusculas
-            clave_elector = clave_elector.upper()
-            
-            # obtenemos seccion del contacto
-            try:
-                seccion = Seccion.objects.get(numero=numero_seccion)
-            except Seccion.DoesNotExist:
-                contexto = {
-                    "titulo": "La seccion elegida no fue encontrada.",
-                    "descripcion": "No hay registro de la seccion elegida al insertar el contacto."
-                }
-                return render(request, "core/error.html", contexto)
+                if nuevo_contacto.curp:
+                    # convertimos CURP a mayusculas
+                    nuevo_contacto.curp = nuevo_contacto.curp.upper()
 
-            # filtramos contactos apellido paterno (sin considerar mayusculas)
-            contactos_repetidos = Contacto.objects.filter(apellido_paterno__iexact=apellido_paterno)
-            # filtramos contactos por nombre (sin considerar mayusculas) y apellido materno (sin considerar mayusculas)
-            contactos_repetidos = contactos_repetidos.filter(nombre__iexact=nombre).filter(apellido_materno__iexact=apellido_materno)
-            # filtramos por telefono
-            if telefono:
-                # si el form incluye telefono
-                contactos_repetidos = contactos_repetidos.filter(telefono__iexact=telefono)
+                if nuevo_contacto.clave_elector:
+                    # convertimos clave de elector a mayusculas
+                    nuevo_contacto.clave_elector = nuevo_contacto.clave_elector.upper()
 
-            # filtramos por curp y clave de elector
-            if curp:
-                # si el form incluye curp
-                contactos_repetidos = contactos_repetidos.filter(curp__iexact=curp)
 
-            if curp:
-                # si el form incluye clave de elector
-                contactos_repetidos = contactos_repetidos.filter(clave_elector__iexact=clave_elector)
-            
-            if contactos_repetidos.exists():
-                contexto = {
-                    "titulo": "Contactos identicos",
-                    "contactos": contactos_repetidos
-                }
+                # --------- SECCION DEL USUARIO -------------------
 
-                messages.warning(request, "Se encontraron contactos con concidencias en la informacion ingresada.")
-                # si existen contactos repetidos redirigir
-                return render(request, "contactos/mostrarContactos.html", contexto)
-            
-            else:
+                # obtenemos numero_seccion del contacto
+                numero_seccion = request.POST.get('seccion')
 
+                # revisamos que numero de seccion sea un numero
                 try:
-                    # si no creamos un nuevo contacto
-                    nuevo_contacto = Contacto.objects.create(
-                        nombre=nombre,
-                        apellido_paterno=apellido_paterno,
-                        apellido_materno=apellido_materno,
-                        email=email,
-                        telefono=telefono,
-                        curp=curp,
-                        clave_elector=clave_elector,
-                        domicilio=domicilio,
-                        seccion=seccion,
-                        parent=contacto
-                    )
-                    nuevo_contacto.save()
-                except Exception as e:
+                    numero_seccion = int(numero_seccion)
+                except ValueError:
+                    # en caso de que no asihnamos 'Sin Seccion'
+                    numero_seccion = -1
+            
+                # obtenemos seccion del contacto
+                try:
+                    seccion = Seccion.objects.get(numero=numero_seccion)
+                except Seccion.DoesNotExist:
+                    messages.error(request, f"Seccion {numero_seccion} no fue reconocida.")
+
+                # ------------ CONTACTOS REPETIDOS --------------------
+
+                # filtramos contactos apellido paterno (sin considerar mayusculas)
+                contactos_repetidos = Contacto.objects.filter(apellido_paterno__iexact=nuevo_contacto.apellido_paterno)
+                # filtramos contactos por nombre (sin considerar mayusculas) y apellido materno (sin considerar mayusculas)
+                contactos_repetidos = contactos_repetidos.filter(nombre__iexact=nuevo_contacto.nombre).filter(apellido_materno__iexact=nuevo_contacto.apellido_materno)
+                # filtramos por telefono
+                if nuevo_contacto.telefono:
+                    # si el form incluye telefono
+                    contactos_repetidos = contactos_repetidos.filter(telefono__iexact=nuevo_contacto.telefono)
+
+                # filtramos por curp y clave de elector
+                if nuevo_contacto.curp:
+                    # si el form incluye curp
+                    contactos_repetidos = contactos_repetidos.filter(curp__iexact=nuevo_contacto.curp)
+
+                if nuevo_contacto.clave_elector:
+                    # si el form incluye clave de elector
+                    contactos_repetidos = contactos_repetidos.filter(clave_elector__iexact=nuevo_contacto.clave_elector)
+                
+                if contactos_repetidos.exists():
                     contexto = {
-                        "titulo": "Error al insertar nuevo contacto.",
-                        "descripcion": e
+                        "titulo": "Contactos identicos",
+                        "contactos": contactos_repetidos,
+                        "nuevo_contacto": nuevo_contacto
                     }
-                    # si existe error al crear un contacto
-                    return render(request, "core/error.html", contexto)
+
+                    messages.warning(request, "Se encontraron contactos con concidencias en la informacion ingresada.")
+                    # si existen contactos repetidos redirigir
+                    return render(request, "contactos/mostrarContactos.html", contexto)
+                
+                else:
+                    try:
+                        # guardamos la informacion del contacto
+                        nuevo_contacto.save()
+                        # enviamos un mensaje
+                        messages.success(request, f"¡{nuevo_contacto.apellido_paterno} {nuevo_contacto.apellido_materno}, {nuevo_contacto.nombre} ingresado a la red!")
+                    except Exception as e:
+                        messages.error(request, "Error al guardar contacto:", e)
+            else:
+                messages.error(request, "Informacion ingresada fue invalidada. Intente de nuevo.")
+                
     else:
         form = ContactoForm()
 
     contexto = {
         "contacto": contacto,
+        "alcance_contactos": contacto.get_descendant_count(),
         "secciones": secciones,
         "form": form,
         "api_url": api_url
