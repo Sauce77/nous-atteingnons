@@ -136,7 +136,7 @@ def editarContacto(request, id_contacto):
                 return redirect('contactos:mostrarPerfilContacto', id_contacto=contacto.id)
     
     else:
-        form = ContactoForm()
+        form = ContactoForm(instance=contacto)
 
     # obtenemos secciones
     secciones = Seccion.objects.all()
@@ -149,6 +149,7 @@ def editarContacto(request, id_contacto):
         "secciones": secciones,
         "contactos": contactos,
         "form": form,
+        "modoForm": "Editar",
     }
 
     return render(request, "contactos/editarContacto.html", contexto)
@@ -269,6 +270,7 @@ def mostrarPerfilContacto(request, id_contacto):
         "alcance_contactos": contacto.get_descendant_count(),
         "secciones": secciones,
         "form": form,
+        "modoForm": "Insertar",
         "api_url": api_url
     }
 

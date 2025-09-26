@@ -2,7 +2,50 @@
 
 <form method="post">
     {% csrf_token %}
-    <input type="hidden" name="id_user_master" value="{{ contacto.id }}">
+
+    {% if modoForm == "Editar" %}
+
+        <!-- selector contacto asociado -->
+        {% if contactos %}
+
+            <div class="d-flex flex-row" id="divDropdownPadre">
+                <p class="my-2 me-2">Contacto asociado:</p>
+                <div class="dropdown my-2">
+                    <button class="btn btn-dark dropdown-toggle" type="button" id="dropdownPadreButton" data-bs-toggle="dropdown" aria-expanded="false">
+                        {% if contacto.parent %}
+                            <strong>{{ contacto.parent.seccion.numero }}:</strong> {{ contacto.parent.apellido_paterno }} {{ contacto.parent.apellido_materno }} {{ contacto.parent.nombre }} 
+                        {% else %}
+                            Sin contacto asociado
+                        {% endif %}
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownPadreButton">
+                        <div class="px-3 py-2">
+                            <input type="text" class="form-control" id="buscarPadre" placeholder="Buscar...">
+                        </div>
+
+                        {% for aux_contacto in contactos %}
+                            {% if aux_contacto.id != contacto.id %}
+                                <li class="dropdown-item" data-value="{{ aux_contacto.id }}">
+                                    <strong>{{ aux_contacto.seccion.numero }}:</strong> {{ aux_contacto.apellido_paterno }} {{ aux_contacto.apellido_materno }} {{ aux_contacto.nombre }}
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <input type="hidden" name="padre" id="inputPadreSeleccionado" value="{{ contacto.parent.id }}">
+            </div>
+        {% else %}
+            <p class="m-2"><i>**No hay contactos disponibles en el sistema.</i></p>
+        {% endif %}
+        <hr><!-- fin editar relacion-->
+
+        {% else %}
+            <input type="hidden" name="id_user_master" value="{{ contacto.id }}">
+        {% endif %}
+
+
+    
     
     <div class="form-floating">
         {{ form.nombre }}
@@ -47,15 +90,19 @@
 
     <!-- selector secciones -->
     {% if secciones %}
-        <div class="d-flex flex-row">
+        <div class="d-flex flex-row" id="divDropdownSeccion">
             <p class="my-2 me-2">Seccion:</p>
             <div class="dropdown my-2">
-                <button class="btn btn-dark dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                    Seleccionar seccion
+                <button class="btn btn-dark dropdown-toggle" type="button" id="dropdownSeccionButton" data-bs-toggle="dropdown" aria-expanded="false">
+                    {% if contacto.seccion.numero > 0 %}
+                        {{ contacto.seccion.numero }}
+                    {% else %}
+                        {{ contacto.seccion.nombre }}
+                    {% endif %}
                 </button>
-                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <ul class="dropdown-menu" aria-labelledby="dropdownSeccionButton">
                     <div class="px-3 py-2">
-                        <input type="text" class="form-control" id="myInput" placeholder="Buscar...">
+                        <input type="text" class="form-control" id="buscarSeccion" placeholder="Buscar...">
                     </div>
 
                     {% for seccion in secciones %}
@@ -70,11 +117,76 @@
                 </ul>
             </div>
 
-            <input type="hidden" name="seccion" id="inputSeccionSeleccionada" value="">
+            <input type="hidden" name="seccion" id="inputSeccionSeleccionada" value="{{ contacto.seccion.numero }}">
         </div>
     {% else %}
         <p class="m-2"><i>**No hay secciones registradas en el sistema.</i></p>
     {% endif %}
+
+    <div class="d-flex gap-2">
+        {% if modoForm == "Editar" %}
+            <input type="submit" class="btn btn-primary flex-fill" name="submitGuardar" value="Guardar">
+        {% elif modoForm == "Insertar" %}
+            <input type="submit" class="btn btn-primary flex-fill" name="submitInsertarRelacion" value="Insertar">
+        {% endif %}
+
+        <a href="{% url 'contactos:mostrarPerfilContacto' id_contacto=contacto.pk %}" class="btn btn-danger flex-fill text-decoration-none text-white ">Cancelar</a>
+    </div>
     
-    <input type="submit" class="btn btn-primary" name="submitInsertarRelacion" value="Insertar">
 </form>
+
+<!-- Script para dropdown padre -->
+<script> 
+$(document).ready(function(){
+    // Código para el filtro de texto
+    $("#buscarPadre").on("keyup", function() {
+        var value = $(this).val().toLowerCase();
+        $(".dropdown-menu li").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    });
+
+    // Lógica para actualizar el botón y el campo oculto
+    $('#divDropdownPadre .dropdown-menu li').on('click', function() {
+        var selectedText = $(this).text();
+        var selectedValue = $(this).data('value'); // Obtiene el valor del atributo 'data-value'
+
+        // Actualiza el texto del botón
+        $('#dropdownPadreButton').text(selectedText);
+
+        // Actualiza el valor del campo oculto
+        $('#inputPadreSeleccionado').val(selectedValue);
+
+        // Cierra el menú desplegable
+        $('.dropdown-menu').dropdown('hide');
+    });
+});
+</script>
+
+<!-- Script para dropdown seccion -->
+<script> 
+$(document).ready(function(){
+    // Código para el filtro de texto
+    $("#buscarSeccion").on("keyup", function() {
+        var value = $(this).val().toLowerCase();
+        $(".dropdown-menu li").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    });
+
+    // Lógica para actualizar el botón y el campo oculto
+    $('#divDropdownSeccion .dropdown-menu li').on('click', function() {
+        var selectedText = $(this).text();
+        var selectedValue = $(this).data('value'); // Obtiene el valor del atributo 'data-value'
+
+        // Actualiza el texto del botón
+        $('#dropdownSeccionButton').text(selectedText);
+
+        // Actualiza el valor del campo oculto
+        $('#inputSeccionSeleccionada').val(selectedValue);
+
+        // Cierra el menú desplegable
+        $('.dropdown-menu').dropdown('hide');
+    });
+});
+</script>
