@@ -1,65 +1,18 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block headers %}
+    <!-- Google Charts -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+{% endblock %}
+
 {% block content %}
 
 {% include "contactos/componentes/tarjetaContacto.html" %}
 
-<!-- Button trigger modal -->
-<button type="button" class="btn btn-primary my-2" data-bs-toggle="modal" data-bs-target="#modalRelacion">
-  Insertar Relacion
-</button>
-
 <!-- diagrama jerarquico -->
 <h5 class="text-center">Red de Alcance</h5>
 <div id="chart_div"></div>
-
-
-<!-- Modal -->
-<div class="modal fade" id="modalRelacion" tabindex="-1" aria-labelledby="modalRelacion" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="modalRelacion">Insertar Relacion</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                {% include "contactos/componentes/formContacto.html" %}
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Script para dropdown seccion -->
-<script> 
-$(document).ready(function(){
-    // Código para el filtro de texto
-    $("#myInput").on("keyup", function() {
-        var value = $(this).val().toLowerCase();
-        $(".dropdown-menu li").filter(function() {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-        });
-    });
-
-    // Lógica para actualizar el botón y el campo oculto
-    $('.dropdown-menu li').on('click', function() {
-        var selectedText = $(this).text();
-        var selectedValue = $(this).data('value'); // Obtiene el valor del atributo 'data-value'
-
-        console.log(selectedValue);
-
-        // Actualiza el texto del botón
-        $('#dropdownMenuButton').text(selectedText);
-
-        // Actualiza el valor del campo oculto
-        $('#inputSeccionSeleccionada').val(selectedValue);
-
-        // Cierra el menú desplegable
-        $('.dropdown-menu').dropdown('hide');
-    });
-});
-</script>
-
 
 <script>
       const apiUrl = "{{ api_url }}"; 

@@ -3,6 +3,7 @@
 {% block content %}
     <h1>{{ titulo }}</h1>
 
+    <a href="{% url 'contactos:insertarContacto' %}" class="btn btn-primary">Nuevo Contacto</a>
     {% include "contactos/componentes/tablaContactos.html" %}
 
 {% endblock %}

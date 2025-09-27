@@ -52,25 +52,9 @@
         <label for="{{ form.domicilio.id_for_label }}">Domicilio</label>
     </div><!-- input domicilio -->
 
-    <!-- selector secciones -->
-    {% if opciones_secciones %}
+    {{ form.seccion }}
 
-        {{ form.seccion }}
+    <input type="submit" id="btnAceptar" class="btn btn-primary" value="Aceptar">
 
-    {% else %}
-        <p class="m-2"><i>**No hay secciones registradas en el sistema.</i></p>
-    {% endif %}
-
-    {% if modoForm == "Editar" %}
-        <input type="submit" class="btn btn-primary flex-fill" name="submitGuardar" value="Guardar">
-    {% elif modoForm == "Insertar" %}
-        <input type="submit" class="btn btn-primary flex-fill" name="submitInsertarRelacion" value="Insertar">
-    {% endif %}
-
-    {% if contacto.pk %}
-        <a href="{% url 'contactos:mostrarPerfilContacto' id_contacto=contacto.pk %}" class="btn btn-danger flex-fill text-decoration-none text-white ">Cancelar</a>
-    {% else %}
-        <a href="{% url 'contactos:mostrarContactos' %}" class="btn btn-danger flex-fill text-decoration-none text-white ">Cancelar</a>
-    {% endif %}
 
 </form>

@@ -2,6 +2,53 @@ from django.db.models import Q
 from contactos.models import Contacto, Seccion
 
 
+def existenCoincidencias(c):
+    """
+        Si encuentra una coincidencia, retorna true
+        de lo contrario false
+    """
+
+    # si el contacto ya tiene un id
+    if c.pk:
+        # 1. Excluir el contacto actual.
+        base_filtro = Contacto.objects.exclude(pk=c.id)
+    else:
+        # el contacto no esta registrado aun
+        base_filtro = Contacto.objects.all()
+
+
+    # CASO 1: Coincidencias de Nombre Completo
+    coincidencias = base_filtro.filter(
+        Q(apellido_paterno__iexact=c.apellido_paterno) & 
+        Q(apellido_materno__iexact=c.apellido_materno) & 
+        Q(nombre__iexact=c.nombre))
+    
+    if coincidencias.exists():
+        return True
+    
+    # CASO 2: Coincidencias de CURP
+    if c.curp:
+        coincidencias = base_filtro.filter(Q(curp__iexact=c.curp))
+
+        if coincidencias.exists():
+            return True
+
+    # CASO 3: Coincidencias de Clave de Elector
+    if c.clave_elector:
+        coincidencias = base_filtro.filter(Q(clave_elector__iexact=c.clave_elector))
+
+        if coincidencias.exists():
+            return True
+
+    # CASO 4: Coincidencias de Telefono
+    if c.telefono:
+        coincidencias = base_filtro.filter(Q(telefono_iexact=c.telefono))
+
+        if coincidencias.exists():
+            return True
+
+    return False
+
 def filtrarContactosDuplicados(c):
     """
         Identifica contactos ya registrados con coincidencias en la 
