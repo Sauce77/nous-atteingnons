@@ -45,5 +45,5 @@ class ContactoForm(forms.ModelForm):
             'curp': forms.TextInput(attrs={'class': 'form-control mb-2', 'placeholder': 'CURP'}),
             'clave_elector': forms.TextInput(attrs={'class': 'form-control mb-2', 'placeholder': 'Clave Elector'}),
             'seccion': SeccionWidget(attrs={"class": "form-select", "data-placeholder": "Buscar seccion..."}),
-            'parent': ContactoAsociadoWidget(attrs={"class": "form-select", "data-placeholder": "Buscar un contacto..."}),
+            'parent': ContactoAsociadoWidget(attrs={"class": "form-select", 'data-allow-clear': 'false', "data-placeholder": "Buscar un contacto..."}),
         }

@@ -9,7 +9,7 @@ def existenCoincidencias(c):
     """
 
     # si el contacto ya tiene un id
-    if c.pk:
+    if c.id:
         # 1. Excluir el contacto actual.
         base_filtro = Contacto.objects.exclude(pk=c.id)
     else:
@@ -56,7 +56,7 @@ def filtrarContactosDuplicados(c):
     """
 
     # si el contacto ya tiene un id
-    if c.pk:
+    if c.id:
         # 1. Excluir el contacto actual.
         base_filtro = Contacto.objects.exclude(pk=c.id)
     else:

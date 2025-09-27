@@ -37,13 +37,13 @@ def insertarContacto(request):
             # alamacenamos las respuestas en una instancia temporal
 
             # capitalizamos el nombre 
-            form.cleaned_data["nombre"] = form.cleaned_data["nombre"].capitalize()
+            form.cleaned_data["nombre"] = form.cleaned_data["nombre"].upper()
 
             # capitalizamos el apellido_paterno
-            form.cleaned_data["apellido_paterno"] = form.cleaned_data["apellido_paterno"].capitalize()
+            form.cleaned_data["apellido_paterno"] = form.cleaned_data["apellido_paterno"].upper()
 
             # capitalizamos el apellido_materno
-            form.cleaned_data["apellido_materno"] = form.cleaned_data["apellido_materno"].capitalize()
+            form.cleaned_data["apellido_materno"] = form.cleaned_data["apellido_materno"].upper()
             
             if form.cleaned_data["curp"]:
                 # colocamos la curp en mayusculas
@@ -105,13 +105,13 @@ def editarContacto(request, id_contacto):
                 # alamacenamos las respuestas en una instancia temporal
 
                 # capitalizamos el nombre 
-                form.cleaned_data["nombre"] = form.cleaned_data["nombre"].capitalize()
+                form.cleaned_data["nombre"] = form.cleaned_data["nombre"].upper()
 
                 # capitalizamos el apellido_paterno
-                form.cleaned_data["apellido_paterno"] = form.cleaned_data["apellido_paterno"].capitalize()
+                form.cleaned_data["apellido_paterno"] = form.cleaned_data["apellido_paterno"].upper()
 
                 # capitalizamos el apellido_materno
-                form.cleaned_data["apellido_materno"] = form.cleaned_data["apellido_materno"].capitalize()
+                form.cleaned_data["apellido_materno"] = form.cleaned_data["apellido_materno"].upper()
                 
                 if form.cleaned_data["curp"]:
                     # colocamos la curp en mayusculas
@@ -181,24 +181,33 @@ def manejarDuplicado(request):
     # obtenemos los datos del contacto
     datos_contacto = request.session.get('datos_contacto')
 
-    if request.method == "POST":
-        return HttpResponse("me duele el pipi")
-    
+    # obtenemos id del contacto
+    id_contacto = request.session.get('id_contacto')
+
+    if id_contacto:
+        # obtenemos objeto del contacto
+        contacto = get_object_or_404(Contacto, pk=id_contacto)
     else:
-        form = ContactoForm(request.POST, initial=datos_contacto)
+        # creamos una instancia de contacto
+        contacto = Contacto(**datos_contacto)
+
+
+    if request.method == "POST":
+        
+        form = ContactoForm(request.POST, instance=contacto)
 
         if form.is_valid():
-            # si la informacion ingresada es valida
+            # si la informacion insertada es valida
             # alamacenamos las respuestas en una instancia temporal
 
             # capitalizamos el nombre 
-            form.cleaned_data["nombre"] = form.cleaned_data["nombre"].capitalize()
+            form.cleaned_data["nombre"] = form.cleaned_data["nombre"].upper()
 
             # capitalizamos el apellido_paterno
-            form.cleaned_data["apellido_paterno"] = form.cleaned_data["apellido_paterno"].capitalize()
+            form.cleaned_data["apellido_paterno"] = form.cleaned_data["apellido_paterno"].upper()
 
             # capitalizamos el apellido_materno
-            form.cleaned_data["apellido_materno"] = form.cleaned_data["apellido_materno"].capitalize()
+            form.cleaned_data["apellido_materno"] = form.cleaned_data["apellido_materno"].upper()
             
             if form.cleaned_data["curp"]:
                 # colocamos la curp en mayusculas
@@ -211,14 +220,39 @@ def manejarDuplicado(request):
             contacto = form.save(commit=False)
             # ------------------- CONTACTOS REPETIDOS -----------------------------
             
-            coincidencias = filtrarContactosDuplicados(contacto)
+            if existenCoincidencias(contacto):
+                # si existe una coincidencia
+                messages.warning(request, "Se encontraron contactos con coincidencias en la informacion ingresada.")
+                # serializamos informacion del form
+                contacto_cleaned_data = form.cleaned_data
+                # guardamos la informacion en la sesion
+                request.session['datos_contacto'] = contacto_cleaned_data
+                # si existen contactos repetidos redirigir a manejarDuplicados
+                return redirect("contactos:manejarDuplicados")
             
-        else:
-            # guardamos los cambios realizados
-            contacto = contacto.save()
-            messages.success(request, f"La informacion de {contacto.apellido_paterno} {contacto.apellido_materno}, {contacto.nombre} se ingreso con exito!")
-            return redirect("contactos:mostrarPerfilContacto", id_contacto=contacto.pk)
+            else:
+                # si ya no existen coincidencias
+                # almacenamos los cambios
+                contacto.save()
 
+                if request.session.get("id_contacto"):
+                    # borramos el id de contacto de la sesion
+                    del request.session["id_contacto"]
+
+                if request.session.get("datos_contacto"):
+                    # borramos los datos de contacto de la sesion
+                    del request.session["datos_contacto"]
+
+                messages.success(request, f"Informacion de contacto ingresada con exito!")
+                return redirect("contactos:mostrarPerfilContacto", id_contacto=contacto.pk)
+
+    
+    else:
+        form = ContactoForm(initial=datos_contacto, instance=contacto)
+
+    # obtenemos las coincidencias encontradas
+    coincidencias = filtrarContactosDuplicados(contacto)
+    
     contexto = {
         "form": form,
         "contactos": coincidencias,

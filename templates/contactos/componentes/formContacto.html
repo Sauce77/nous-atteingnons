@@ -8,14 +8,13 @@
     {% csrf_token %}
 
 
-    <div class="row my-4">
+    <div class="row">
         <div class="col-lg-6">
-            <p>Contacto Asociado:</p>
-            {{ form.parent }}
+            <p>Contacto Asociado: {{ form.parent }}</p>
+            
         </div>
-        <div class="col-lg-3 justify-end">
-            <p>Seccion:</p>
-            {{ form.seccion }}
+        <div class="col-lg-3 col-md-6">
+            <p>Seccion: {{ form.seccion }}</p>
         </div>
     </div>
     
