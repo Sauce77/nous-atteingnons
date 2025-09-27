@@ -26,6 +26,7 @@ class SeccionWidget(s2forms.ModelSelect2Widget):
         "nombre__icontains",
     ]
 
+
 class ContactoForm(forms.ModelForm):
     """
         Renderiza el form del modelo contacto.
@@ -43,6 +44,6 @@ class ContactoForm(forms.ModelForm):
             'domicilio': forms.Textarea(attrs={'class': 'form-control mb-2', 'placeholder': 'Domicilio'}),
             'curp': forms.TextInput(attrs={'class': 'form-control mb-2', 'placeholder': 'CURP'}),
             'clave_elector': forms.TextInput(attrs={'class': 'form-control mb-2', 'placeholder': 'Clave Elector'}),
-            'seccion': SeccionWidget,
-            'parent': ContactoAsociadoWidget,
+            'seccion': SeccionWidget(attrs={"class": "form-select", "data-placeholder": "Buscar seccion..."}),
+            'parent': ContactoAsociadoWidget(attrs={"class": "form-select", "data-placeholder": "Buscar un contacto..."}),
         }

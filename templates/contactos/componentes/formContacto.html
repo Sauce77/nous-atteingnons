@@ -8,7 +8,17 @@
     {% csrf_token %}
 
 
-    {{ form.parent }}
+    <div class="row my-4">
+        <div class="col-lg-6">
+            <p>Contacto Asociado:</p>
+            {{ form.parent }}
+        </div>
+        <div class="col-lg-3 justify-end">
+            <p>Seccion:</p>
+            {{ form.seccion }}
+        </div>
+    </div>
+    
     
     
     <div class="form-floating">
@@ -17,11 +27,11 @@
     </div><!-- input nombre -->
 
     <div class="d-flex flex-row gap-1 mb-2">
-        <div class="form-floating">
+        <div class="form-floating flex-fill">
             {{ form.apellido_paterno }}
             <label for="{{ form.apellido_paterno.id_for_label }}">Apellido Paterno</label>
         </div><!-- input apellido paterno -->
-        <div class="form-floating">
+        <div class="form-floating flex-fill">
             {{ form.apellido_materno }}
             <label for="{{ form.apellido_materno.id_for_label }}">Apellido Materno</label>
         </div><!-- input apellido materno -->
@@ -51,8 +61,6 @@
         {{ form.domicilio }}
         <label for="{{ form.domicilio.id_for_label }}">Domicilio</label>
     </div><!-- input domicilio -->
-
-    {{ form.seccion }}
 
     <input type="submit" id="btnAceptar" class="btn btn-primary" value="Aceptar">
 
