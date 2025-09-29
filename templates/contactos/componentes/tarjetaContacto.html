@@ -8,6 +8,12 @@
 
         {% if alcance_contactos %}
             <p class="fs-6 my-2">Alcance: {{ alcance_contactos }} contacto(s)</p>
+        {% else %}
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="idContacto" value="{{ contacto.pk }}">
+                <input type="submit" name="btnBorrarContacto" class="btn btn-danger mt-2" value="Borrar">
+            </form>
         {% endif %}
     </div>
 
