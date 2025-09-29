@@ -8,6 +8,12 @@
 
         {% if alcance_contactos %}
             <p class="fs-6 my-2">Alcance: {{ alcance_contactos }} contacto(s)</p>
+        {% else %}
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="idContacto" value="{{ contacto.pk }}">
+                <input type="submit" name="btnBorrarContacto" class="btn btn-danger mt-2" value="Borrar">
+            </form>
         {% endif %}
     </div>
 
@@ -90,7 +96,16 @@
             </div><!-- div zonales -->
         {% endif %}
 
-        <div class="flex text-end">
+        <div class="d-flex gap-2">
+            
+            <form method="post">
+                {% csrf_token %}
+                {% if contacto.estatus == "A" %}
+                    <input type="submit" name="btnAfiliacion" class="btn btn-primary" value="Afiliado">
+                {% else %}
+                    <input type="submit" name="btnAfiliacion" class="btn btn-danger" value="Desafiliado">
+                {% endif %}
+            </form>
             <a href="{% url 'contactos:editarContacto' id_contacto=contacto.pk %}" class="btn btn-secondary text-decoration-none text-white">Editar</a>
         </div>
 

@@ -46,6 +46,7 @@ class ContactSerializer(serializers.ModelSerializer):
                   'nombre', 
                   'apellido_paterno', 
                   'apellido_materno',
+                  'estatus',
                   'descendant_count')
         
     def get_descendant_count(self, obj):
@@ -63,6 +64,7 @@ class ContactWithChildrenSerializer(serializers.ModelSerializer):
                   'nombre', 
                   'apellido_paterno', 
                   'apellido_materno',
+                  'estatus',
                   'descendant_count',
                   'children')
     

@@ -1,8 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
 from django.urls import reverse
 from django.contrib import messages
+from django.db.models import F
 
 from scripts.validacionesContactos import filtrarContactosDuplicados, existenCoincidencias, normalizarDatosContacto
+from scripts.operacionesContactos import borrarContacto
 
 from .models import Contacto, Seccion
 from .forms import ContactoForm
@@ -159,6 +161,37 @@ def mostrarPerfilContacto(request, id_contacto):
     # obtenemos url para serializador del arbol
     api_url = reverse('api:mostrarRelaciones', args=[contacto.pk])
 
+    if request.method == "POST":
+        # obtenemos btnBorrarContacto
+        btnBorrarContacto = request.POST.get('btnBorrarContacto')
+        # obtenemos btnAfiliacion
+        btnAfiliacion = request.POST.get('btnAfiliacion')
+
+        if btnBorrarContacto == "Borrar":
+            # obtenemos id del contacto
+            id_contacto = request.POST.get("idContacto")
+
+            if borrarContacto(id_contacto):
+                # si el contacto se pudo eliminar
+                messages.error(request, "Contacto eliminado.")
+                return redirect("contactos:mostrarContactos")
+
+            else:
+                messages.warning(request, "Este contacto mantiene relaciones registradas. Considere marcar el contacto como 'Desafiliado' o modifique los contactos relacionados.")
+
+        elif btnAfiliacion == "Afiliado":
+            # cambiamos el estado a desafiliado
+            contacto.estatus = "D"
+            contacto.save()
+            messages.info(request, f"El estatus del contacto cambio a 'Desafiliado'")
+
+        elif btnAfiliacion == "Desafiliado":
+            # cambiamos el estado a desafiliado
+            contacto.estatus = "A"
+            contacto.save()
+            messages.info(request, f"El estatus del contacto cambio a 'Afiliado'")
+
+
     contexto = {
         "contacto": contacto,
         "alcance_contactos": contacto.get_descendant_count(),
@@ -228,7 +261,6 @@ def manejarDuplicado(request):
     coincidencias = filtrarContactosDuplicados(contacto)
     
     contexto = {
-        "id_contacto": id_contacto,
         "form": form,
         "contactos": coincidencias,
     }
