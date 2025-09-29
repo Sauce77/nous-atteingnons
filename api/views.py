@@ -2,9 +2,11 @@
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import viewsets
+from rest_framework.decorators import action
 from contactos.models import Contacto
 from django.shortcuts import get_object_or_404
-from .serializers import ContactoSerializer, ContactWithChildrenSerializer
+from .serializers import ContactoSerializer, ContactWithChildrenSerializer, ContactSerializer
 
 class ContactDetailWithChildrenView(APIView):
     def get(self, request, pk):
@@ -39,3 +41,26 @@ class ContactoSubtreeView(generics.RetrieveAPIView):
             return node.get_descendants(include_self=True)
         except Contacto.DoesNotExist:
             return Contacto.objects.none()
+
+class ContactoPlanoView(APIView):
+
+    def get(self, request, pk, format=None):
+        # 1. Obtener el nodo base
+        try:
+            node = Contacto.objects.get(pk=pk)
+        except Contacto.DoesNotExist:
+            return Response(
+                {"detail": "Nodo no encontrado."}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # 2. Obtener los descendientes E INCLUIR AL NODO RAÍZ
+        # Al pasar include_self=True, el QuerySet devuelto contendrá el nodo base
+        # junto con todos sus descendientes.
+        descendants_queryset = node.get_descendants(include_self=True)
+
+        # 3. Serializar el QuerySet
+        serializer = ContactSerializer(descendants_queryset, many=True)
+        
+        # 4. Devolver la respuesta
+        return Response(serializer.data, status=status.HTTP_200_OK)
