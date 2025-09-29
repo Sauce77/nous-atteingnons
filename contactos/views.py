@@ -61,6 +61,8 @@ def insertarContacto(request):
 
                     # guardamos la informacion en la sesion
                     request.session['datos_contacto'] = contacto_cleaned_data
+                    # guardamos el id de contacto como nulo
+                    request.session['id_contacto'] = None
                     # si existen contactos repetidos redirigir a manejarDuplicados
                     return redirect("contactos:manejarDuplicados")
                 
@@ -181,14 +183,28 @@ def manejarDuplicado(request):
     if id_contacto:
         # obtenemos objeto del contacto
         contacto = get_object_or_404(Contacto, pk=id_contacto)
-    else:
+    elif datos_contacto:
         # creamos una instancia de contacto
         contacto = Contacto(**datos_contacto)
+    else:
+        contexto = {
+            "titulo": "No se pudo encontrar informacion.",
+            "descripcion": "La informacion ingresada no pudo ser insertada.",
+        }
 
+        return render(request, "core/error.html", contexto)
 
     if request.method == "POST":
         
         form = ContactoForm(request.POST, instance=contacto)
+
+        if request.session.get('id_contacto'):
+            # borramos el id de contacto de la sesion
+            del request.session["id_contacto"]
+
+        if request.session.get('datos_contacto'):
+            # borramos los datos de contacto de la sesion
+            del request.session["datos_contacto"]
 
         if form.is_valid():
             # si la informacion insertada es valida
@@ -196,14 +212,6 @@ def manejarDuplicado(request):
 
             # obtenemos una instancia temporal
             form.save()
-
-            if request.session.get("id_contacto"):
-                # borramos el id de contacto de la sesion
-                del request.session["id_contacto"]
-
-            if request.session.get("datos_contacto"):
-                # borramos los datos de contacto de la sesion
-                del request.session["datos_contacto"]
 
             messages.info(request, f"Informacion de contacto ingresada con exito!.")
             return redirect("contactos:mostrarPerfilContacto", id_contacto=contacto.pk)
@@ -220,6 +228,7 @@ def manejarDuplicado(request):
     coincidencias = filtrarContactosDuplicados(contacto)
     
     contexto = {
+        "id_contacto": id_contacto,
         "form": form,
         "contactos": coincidencias,
     }
