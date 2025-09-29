@@ -3,8 +3,10 @@ from django.urls import reverse
 from django.contrib import messages
 from django.db.models import F
 
-from scripts.validacionesContactos import filtrarContactosDuplicados, existenCoincidencias, normalizarDatosContacto
-from scripts.operacionesContactos import borrarContacto
+from scripts.validacionesContactos import filtrarContactosDuplicados, existenCoincidencias
+from scripts.operacionesContactos import borrarContacto, obtenerDescendientesPlano
+
+import pandas as pd
 
 from .models import Contacto, Seccion
 from .forms import ContactoForm
@@ -166,6 +168,8 @@ def mostrarPerfilContacto(request, id_contacto):
         btnBorrarContacto = request.POST.get('btnBorrarContacto')
         # obtenemos btnAfiliacion
         btnAfiliacion = request.POST.get('btnAfiliacion')
+        # obtenemos btnAfiliacion
+        btnDescargarExcel = request.POST.get('btnDescargarExcel')
 
         if btnBorrarContacto == "Borrar":
             # obtenemos id del contacto
@@ -190,6 +194,44 @@ def mostrarPerfilContacto(request, id_contacto):
             contacto.estatus = "A"
             contacto.save()
             messages.info(request, f"El estatus del contacto cambio a 'Afiliado'")
+
+        elif btnDescargarExcel == "Descargar":
+
+            # obtenemos url para descencdientes
+            api_url = reverse("api:mostrarContactoPlano", kwargs={'pk': contacto.pk})
+
+            url_absoluta = request.build_absolute_uri(api_url)
+
+            datos = obtenerDescendientesPlano(url_absoluta, contacto)
+
+            if datos:
+
+                # archivo de salida
+                nombre_archivo_salida = f'Contactos-{contacto.apellido_paterno}-{contacto.apellido_materno}-{contacto.nombre}.xlsx'
+                
+                df = pd.DataFrame(datos)
+        
+                # 3. Crear el objeto HttpResponse de Django
+                # Especificamos el Content-Type para un archivo Excel (.xlsx)
+                response = HttpResponse(
+                    content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                )
+                
+                # 4. Configurar la cabecera Content-Disposition
+                # 'attachment' indica al navegador que descargue el archivo.
+                # 'filename' especifica el nombre del archivo que se descargará.
+                response['Content-Disposition'] = f'attachment; filename="{nombre_archivo_salida}"'
+                
+                # 5. Guardar el DataFrame directamente en el objeto HttpResponse
+                # Usamos BytesIO (proceso interno de to_excel) para no escribir el archivo en disco.
+                df.to_excel(response, index=False, sheet_name='Datos Aplanados')
+                
+                # 6. Devolver la respuesta al navegador
+                messages.success(request, f"Se ha completado la descarga {nombre_archivo_salida}")
+                return response
+            
+            else:
+                messages.error(request, "Hubo un problema al descargar el archivo.")
 
 
     contexto = {

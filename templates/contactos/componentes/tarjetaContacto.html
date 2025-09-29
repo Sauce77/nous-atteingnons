@@ -105,6 +105,8 @@
                 {% else %}
                     <input type="submit" name="btnAfiliacion" class="btn btn-danger" value="Desafiliado">
                 {% endif %}
+
+                <input type="submit" name="btnDescargarExcel" class="btn btn-success" value="Descargar">
             </form>
             <a href="{% url 'contactos:editarContacto' id_contacto=contacto.pk %}" class="btn btn-secondary text-decoration-none text-white">Editar</a>
         </div>

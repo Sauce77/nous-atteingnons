@@ -46,6 +46,11 @@ class ContactSerializer(serializers.ModelSerializer):
                   'nombre', 
                   'apellido_paterno', 
                   'apellido_materno',
+                  'telefono',
+                  'email',
+                  'curp',
+                  'clave_elector',
+                  'domicilio',
                   'estatus',
                   'descendant_count')
         
