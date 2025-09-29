@@ -1,0 +1,101 @@
+<div class="card my-2 p-1">
+  <div class="row g-0">
+    <div class="col-md-2 text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="8rem" height="8rem" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+            <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+            <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
+        </svg> <!-- user icon -->
+
+        {% if alcance_contactos %}
+            <p class="fs-6 my-2">Alcance: {{ alcance_contactos }} contacto(s)</p>
+        {% endif %}
+    </div>
+
+    <div class="col-md-10">
+      <div class="card-body">
+        <h3 class="card-title ">{{ contacto.nombre }} {{ contacto.apellido_paterno }} {{ contacto.apellido_materno }}</h3>
+        {% if contacto.parent %}
+            <p>
+                <strong>Contacto Asociado:</strong> 
+                <a href="{% url 'contactos:mostrarPerfilContacto' id_contacto=contacto.parent.id %}" class="link-dark">
+                    {{ contacto.parent.nombre }} {{ contacto.parent.apellido_paterno }} {{ contacto.parent.apellido_materno }}
+                </a>
+            </p>
+        {% else %}
+            <p class="m-2"><i>**Sin contacto asociado.</i></p>
+        {% endif %}
+    
+        <div class="d-flex flex-row gap-5 fs-5">
+            <p><strong>Email:</strong>
+                {% if contacto.email %}
+                    {{ contacto.email }}
+                {% else %}
+                    Email no disponible
+                {% endif %}
+            </p>
+            <p><strong>Telefono:</strong>
+                {% if contacto.telefono %}
+                    {{ contacto.telefono }}
+                {% else %}
+                    Telefono no disponible
+                {% endif %}
+            </p>
+        </div><!-- div contacto -->
+
+        <p>
+            <strong>CURP: </strong>
+            {% if contacto.curp %}
+                {{ contacto.curp }}
+            {% else %}
+                No registrado
+            {% endif %}
+        </p> <!-- curp -->
+
+        <p>
+            <strong>Clave Elector: </strong>
+            {% if contacto.clave_elector %}
+                {{ contacto.clave_elector }}
+            {% else %}
+                No registrado
+            {% endif %}
+        </p> <!-- clave elector -->
+
+        <p>
+            <strong>Domicilio: </strong>
+            {% if contacto.domicilio %}
+                {{ contacto.domicilio }}
+            {% else %}
+                No registrado.
+            {% endif %}
+        </p> <!-- domicilio -->
+        
+        {% if contacto.seccion.numero > 0 %}
+            <p><strong>Seccion:</strong>
+                {% if contacto.seccion.numero > 0 %}
+                    {{ contacto.seccion.numero }}
+                {% else %}
+                    {{ contacto.seccion.nombre }}
+                {% endif %}
+            </p>
+            <div class="d-flex flex-row">
+                <p><strong>Zonales:</strong>
+                    {% if contacto.seccion.zonales.all %}
+                        {% for zonal in contacto.seccion.zonales.all %}
+                            <p>{{ zonal.nombre }}</p>
+                        {% endfor %}
+                    {% else %}
+                        No hay zonales asignados a esta seccion.
+                    {% endif %}
+                </p>
+            </div><!-- div zonales -->
+        {% endif %}
+
+        <div class="flex text-end">
+            <a href="{% url 'contactos:editarContacto' id_contacto=contacto.pk %}" class="btn btn-secondary text-decoration-none text-white">Editar</a>
+        </div>
+
+      </div>
+    </div><!-- info contacto -->
+
+  </div><!-- div row -->
+</div><!-- tarjeta de contacto -->

@@ -1,8 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
 from django.urls import reverse
+from django.contrib import messages
 
+from scripts.validacionesContactos import filtrarContactosDuplicados, existenCoincidencias, normalizarDatosContacto
 
 from .models import Contacto, Seccion
+from .forms import ContactoForm
 # Create your views here.
 
 def mostrarContactos(request):
@@ -14,92 +17,221 @@ def mostrarContactos(request):
     contactos = Contacto.objects.all()
 
     contexto = {
+        "titulo": "Contactos",
         "contactos": contactos,
     }
 
     return render(request, "contactos/mostrarContactos.html", contexto)
 
+def insertarContacto(request):
+    """
+        Inserta un contacto en la red.
+    """
 
-def mostrarPerfilContacto(request, id_contacto):
+    if request.method == "POST":
 
-    try:
-        # obtenemos objeto del usuario seleccionado
-        contacto = Contacto.objects.get(pk=id_contacto)
-    except Contacto.DoesNotExist:
-        contexto = {
-            "titulo": "Contacto no encontrado.",
-            "descripcion": "El contacto seleccionado no pudo ser encontrado en los registros."
-        }
-        return render(request, "core/error.html", contexto)
+        # obtenemos boton btnSubmitContacto
+        btnSubmitContacto = request.POST.get("btnSubmitContacto")
+
+        if btnSubmitContacto == "Aceptar":
+            # instanciamos el form con las respuestas
+            form = ContactoForm(request.POST)
+
+            if form.is_valid():
+                # si la informacion es correcta
+                # alamacenamos las respuestas en una instancia temporal
+
+                # obtenemos una instancia temporal normalizada de contacto
+                contacto = form.save(commit=False)
+
+                # --------------- CONTACTOS REPETIDOS -------------------
+                if existenCoincidencias(contacto):
+                    # si existe una coincidencia
+                    messages.warning(request, "Se encontraron contactos con coincidencias en la informacion ingresada.")
+                    # serializamos informacion del form
+                    contacto_cleaned_data = form.cleaned_data
+                    
+                    if contacto.seccion:
+                        # insertamos solo llave foranea de la seccion
+                        contacto_cleaned_data['seccion'] = contacto.seccion.pk
+
+                    if contacto.parent:
+                        # insertamos solo llave foranea del contacto asociado
+                        contacto_cleaned_data['parent'] = contacto.parent.pk
+
+                    # guardamos la informacion en la sesion
+                    request.session['datos_contacto'] = contacto_cleaned_data
+                    # guardamos el id de contacto como nulo
+                    request.session['id_contacto'] = None
+                    # si existen contactos repetidos redirigir a manejarDuplicados
+                    return redirect("contactos:manejarDuplicados")
+                
+                else:
+                    # guardamos los cambios realizados
+                    contacto.save()
+                    messages.success(request, f"Nuevo contacto ingresado con exito!")
+                    return redirect("contactos:mostrarPerfilContacto", id_contacto=contacto.pk)
+
+            else:
+                messages.error(request, "La informacion ingresada no pudo ser validada. Intente de nuevo.")
+    else:
+        # crear un form vacio
+        form = ContactoForm()
+
+    contexto = {
+        "form": form
+    }
+
+    return render(request, "contactos/editarContacto.html", contexto)
+
+def editarContacto(request, id_contacto):
+    """
+        Permite modificar la informacion y la relacion de un contacto seleccionado.
+    """
+
+    # obtenemos el contacto
+    contacto = get_object_or_404(Contacto, pk=id_contacto)
     
-    # obtenemos url para serializador del arbol
-    api_url = reverse('api:mostrarSubArbol', args=[contacto.pk])
-
-    # obtenemos todas las secciones
-    secciones = Seccion.objects.all()
-
     # logica post form
     if request.method == "POST":
-        # obtenemos el boton submitInsertarRelacion
-        submitInsertarRelacion = request.POST.get('submitInsertarRelacion')
-        # si el valor es "Insertar"
-        if submitInsertarRelacion == "Insertar":
-            # obtenemos nombre del contacto
-            nombre = request.POST.get('nombre')
-            # obtenemos apellido paterno del contacto
-            apellido_paterno = request.POST.get('apellido_paterno')
-            # obtenemos apellido materno del contacto
-            apellido_materno = request.POST.get('apellido_materno')
-            # obtenemos email del contacto
-            email = request.POST.get('email')
-            # obtenemos telefono del contacto
-            telefono = request.POST.get('telefono')
-            # obtenemos domicilio del contacto
-            domicilio = request.POST.get('domicilio')
+        # obtenemos boton submitGuardar
+        btnSubmitContacto = request.POST.get('btnSubmitContacto')
 
-            # obtenemos numero_seccion del contacto
-            numero_seccion = request.POST.get('seccion')
-            # obtenemos seccion del contacto
-            try:
-                seccion = Seccion.objects.get(numero=numero_seccion)
-            except Seccion.DoesNotExist:
-                contexto = {
-                    "titulo": "La seccion elegida no fue encontrada.",
-                    "descripcion": "No hay registro de la seccion elegida al insertar el contacto."
-                }
-                return render(request, "core/error.html", contexto)
+        if btnSubmitContacto == "Aceptar":
+            # obtenemos respuestas de la peticion POST
+            form = ContactoForm(request.POST, instance=contacto)
 
-            # filtramos contactos por seccion y apellido paterno (sin considerar mayusculas)
-            contactos_repetidos = Contacto.objects.filter(seccion=seccion).filter(apellido_paterno__iexact=apellido_paterno)
-            # filtramos contactos por nombre (sin considerar mayusculas) y apellido materno (sin considerar mayusculas)
-            contactos_repetidos = contactos_repetidos.filter(nombre__iexact=nombre).filter(apellido_materno__iexact=apellido_materno)
+            if form.is_valid():
+                # si la informacion insertada es valida
+                # alamacenamos las respuestas en una instancia temporal
 
-            if contactos_repetidos:
-                contexto = {
-                    "titulo": "El contacto a insertar, ya existe.",
-                    "descripcion": "Se ha encontrado un contacto que coincide en seccion, nombre y apellidos."
-                }
-                # si existen contactos repetidos redirigir
-                return render(request, "core/error.html", contexto)
-            
+                # obtenemos una instancia temporal normalizada de contacto
+                contacto = form.save(commit=False)
+                # ------------------- CONTACTOS REPETIDOS -----------------------------
+                
+                if existenCoincidencias(contacto):
+                    # si existe una coincidencia
+                    messages.warning(request, "Se encontraron contactos con coincidencias en la informacion ingresada.")
+                    # serializamos informacion del form
+                    contacto_cleaned_data = form.cleaned_data
+
+                    if contacto.seccion:
+                        # insertamos solo llave foranea de la seccion
+                        contacto_cleaned_data['seccion'] = contacto.seccion.pk
+
+                    if contacto.parent:
+                        # insertamos solo llave foranea del contacto asociado
+                        contacto_cleaned_data['parent'] = contacto.parent.pk
+
+                    # guardamos la informacion en la sesion
+                    request.session['datos_contacto'] = contacto_cleaned_data
+                    # guardamos el id de contacto
+                    request.session['id_contacto'] = contacto.id
+                    # si existen contactos repetidos redirigir a manejarDuplicados
+                    return redirect("contactos:manejarDuplicados")
+                
+                else:
+                    # guardamos los cambios realizados
+                    contacto = form.save()
+                    messages.info(request, f"La informacion de {contacto.apellido_paterno} {contacto.apellido_materno}, {contacto.nombre} ha sido modificada.")
+                    return redirect("contactos:mostrarPerfilContacto", id_contacto=contacto.pk)
             else:
-                # si no creamos un nuevo contacto
-                nuevo_contacto = Contacto.objects.create(
-                    nombre=nombre,
-                    apellido_paterno=apellido_paterno,
-                    apellido_materno=apellido_materno,
-                    email=email,
-                    telefono=telefono,
-                    domicilio=domicilio,
-                    seccion=seccion,
-                    parent=contacto
-                )
-                nuevo_contacto.save()
-            
+                messages.error(request, "Informacion ingresada fue invalidada. Intente de nuevo.")
+
+    else:
+        form = ContactoForm(instance=contacto)
+
     contexto = {
         "contacto": contacto,
-        "secciones": secciones,
+        "form": form,
+    }
+
+    return render(request, "contactos/editarContacto.html", contexto)
+
+def mostrarPerfilContacto(request, id_contacto):
+    """
+        Muestra la informacion de contacto y sus relaciones.
+    """
+
+    # obtenemos el contacto
+    contacto = get_object_or_404(Contacto, pk=id_contacto)
+    
+    # obtenemos url para serializador del arbol
+    api_url = reverse('api:mostrarRelaciones', args=[contacto.pk])
+
+    contexto = {
+        "contacto": contacto,
+        "alcance_contactos": contacto.get_descendant_count(),
         "api_url": api_url
     }
 
     return render(request, "contactos/mostrarPerfilContacto.html", contexto)
+
+
+def manejarDuplicado(request):
+    """
+        Al encontrar un registro con coincidencias, esta vista permite corregir
+        la informacion ingresada para evitar duplicados.
+    """
+
+    # obtenemos los datos del contacto
+    datos_contacto = request.session.get('datos_contacto')
+
+    # obtenemos id del contacto
+    id_contacto = request.session.get('id_contacto')
+
+    if id_contacto:
+        # obtenemos objeto del contacto
+        contacto = get_object_or_404(Contacto, pk=id_contacto)
+    elif datos_contacto:
+        # creamos una instancia de contacto
+        contacto = Contacto(**datos_contacto)
+    else:
+        contexto = {
+            "titulo": "No se pudo encontrar informacion.",
+            "descripcion": "La informacion ingresada no pudo ser insertada.",
+        }
+
+        return render(request, "core/error.html", contexto)
+
+    if request.method == "POST":
+        
+        form = ContactoForm(request.POST, instance=contacto)
+
+        if request.session.get('id_contacto'):
+            # borramos el id de contacto de la sesion
+            del request.session["id_contacto"]
+
+        if request.session.get('datos_contacto'):
+            # borramos los datos de contacto de la sesion
+            del request.session["datos_contacto"]
+
+        if form.is_valid():
+            # si la informacion insertada es valida
+            # alamacenamos las respuestas en una instancia temporal
+
+            # obtenemos una instancia temporal
+            form.save()
+
+            messages.info(request, f"Informacion de contacto ingresada con exito!.")
+            return redirect("contactos:mostrarPerfilContacto", id_contacto=contacto.pk)
+        
+        else:
+            # el fomulario presenta errores
+            messages.error(request, "La informacion ingresada no fue validada.")
+
+    
+    else:
+        form = ContactoForm(initial=datos_contacto, instance=contacto)
+
+    # obtenemos las coincidencias encontradas
+    coincidencias = filtrarContactosDuplicados(contacto)
+    
+    contexto = {
+        "id_contacto": id_contacto,
+        "form": form,
+        "contactos": coincidencias,
+    }
+
+    return render(request, "contactos/mostrarDuplicados.html", contexto)
+

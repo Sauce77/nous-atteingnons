@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django_select2',
     'mptt',
     'contactos',
     'api'
@@ -135,3 +136,20 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# settings.py
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "select2_cache_table", # Nombre de la tabla de caché
+    },
+    # Define la caché específica que usará django-select2
+    "select2": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "select2_cache_table",
+    }
+}
+
+# Tell select2 which cache configuration to use:
+SELECT2_CACHE_BACKEND = "select2"

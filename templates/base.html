@@ -17,8 +17,8 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.4/css/dataTables.dataTables.css" />
     <script src="https://cdn.datatables.net/2.3.4/js/dataTables.js"></script>
 
-    <!-- Google Charts -->
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    {% block headers %}
+    {% endblock %}
     
     <style>
         body {
@@ -57,6 +57,24 @@
     </nav>
     
     <div class="content container mt-5">
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <div 
+
+                    {% if message.tags == "debug" %} class="alert alert-secondary" {% endif %}
+                    {% if message.tags == "info" %} class="alert alert-primary" {% endif %}
+                    {% if message.tags == "success" %} class="alert alert-success" {% endif %}
+                    {% if message.tags == "warning" %} class="alert alert-warning" {% endif %}
+                    {% if message.tags == "error" %} class="alert alert-danger" {% endif %}
+                    role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+
         {% block content %}
         {% endblock %}
     </div>

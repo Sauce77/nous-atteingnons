@@ -58,7 +58,7 @@ function processNode(node, allRows, parentId) {
   allRows.push([
     nodeData,
     parentId,
-    `Descendientes: ${node.descendant_count}`
+    `Contactos: ${node.descendant_count}`
   ]);
   
   if (node.children && node.children.length > 0) {
