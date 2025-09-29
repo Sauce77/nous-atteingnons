@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
 from django.urls import reverse
 from django.contrib import messages
 
-from scripts.validacionesContactos import filtrarContactosDuplicados, existenCoincidencias
+from scripts.validacionesContactos import filtrarContactosDuplicados, existenCoincidencias, normalizarDatosContacto
 
 from .models import Contacto, Seccion
 from .forms import ContactoForm
@@ -29,48 +29,49 @@ def insertarContacto(request):
     """
 
     if request.method == "POST":
-        # instanciamos el form con las respuestas
-        form = ContactoForm(request.POST)
 
-        if form.is_valid():
-            # si la informacion es correcta
-            # alamacenamos las respuestas en una instancia temporal
+        # obtenemos boton btnSubmitContacto
+        btnSubmitContacto = request.POST.get("btnSubmitContacto")
 
-            # capitalizamos el nombre 
-            form.cleaned_data["nombre"] = form.cleaned_data["nombre"].upper()
+        if btnSubmitContacto == "Aceptar":
+            # instanciamos el form con las respuestas
+            form = ContactoForm(request.POST)
 
-            # capitalizamos el apellido_paterno
-            form.cleaned_data["apellido_paterno"] = form.cleaned_data["apellido_paterno"].upper()
+            if form.is_valid():
+                # si la informacion es correcta
+                # alamacenamos las respuestas en una instancia temporal
 
-            # capitalizamos el apellido_materno
-            form.cleaned_data["apellido_materno"] = form.cleaned_data["apellido_materno"].upper()
-            
-            if form.cleaned_data["curp"]:
-                # colocamos la curp en mayusculas
-                form.cleaned_data["curp"] = form.cleaned_data["curp"].upper()
+                # obtenemos una instancia temporal normalizada de contacto
+                contacto = form.save(commit=False)
 
-            if form.cleaned_data["clave_elector"]:
-                # colocamos la clave_elector en mayusculas
-                form.cleaned_data["clave_elector"] = form.cleaned_data["clave_elector"].upper()
+                # --------------- CONTACTOS REPETIDOS -------------------
+                if existenCoincidencias(contacto):
+                    # si existe una coincidencia
+                    messages.warning(request, "Se encontraron contactos con coincidencias en la informacion ingresada.")
+                    # serializamos informacion del form
+                    contacto_cleaned_data = form.cleaned_data
+                    
+                    if contacto.seccion:
+                        # insertamos solo llave foranea de la seccion
+                        contacto_cleaned_data['seccion'] = contacto.seccion.pk
 
-            contacto = form.save(commit=False)
+                    if contacto.parent:
+                        # insertamos solo llave foranea del contacto asociado
+                        contacto_cleaned_data['parent'] = contacto.parent.pk
 
-            if existenCoincidencias(contacto):
-                # si existe una coincidencia
-                messages.warning(request, "Se encontraron contactos con coincidencias en la informacion ingresada.")
-                # serializamos informacion del form
-                contacto_cleaned_data = form.cleaned_data
-                # guardamos la informacion en la sesion
-                request.session['datos_contacto'] = contacto_cleaned_data
-                # si existen contactos repetidos redirigir a manejarDuplicados
-                return redirect("contactos:manejarDuplicados")
-            
+                    # guardamos la informacion en la sesion
+                    request.session['datos_contacto'] = contacto_cleaned_data
+                    # si existen contactos repetidos redirigir a manejarDuplicados
+                    return redirect("contactos:manejarDuplicados")
+                
+                else:
+                    # guardamos los cambios realizados
+                    contacto.save()
+                    messages.success(request, f"Nuevo contacto ingresado con exito!")
+                    return redirect("contactos:mostrarPerfilContacto", id_contacto=contacto.pk)
+
             else:
-                # guardamos los cambios realizados
-                contacto.save()
-                messages.success(request, f"Nuevo contacto ingresado con exito!")
-                return redirect("contactos:mostrarPerfilContacto", id_contacto=contacto.pk)
-
+                messages.error(request, "La informacion ingresada no pudo ser validada. Intente de nuevo.")
     else:
         # crear un form vacio
         form = ContactoForm()
@@ -92,11 +93,9 @@ def editarContacto(request, id_contacto):
     # logica post form
     if request.method == "POST":
         # obtenemos boton submitGuardar
-        submitGuardar = request.POST.get('submitGuardar')
+        btnSubmitContacto = request.POST.get('btnSubmitContacto')
 
-        # si el valor de submitGuardar es 'Guardar'
-        if submitGuardar == "Guardar":
-            
+        if btnSubmitContacto == "Aceptar":
             # obtenemos respuestas de la peticion POST
             form = ContactoForm(request.POST, instance=contacto)
 
@@ -104,23 +103,7 @@ def editarContacto(request, id_contacto):
                 # si la informacion insertada es valida
                 # alamacenamos las respuestas en una instancia temporal
 
-                # capitalizamos el nombre 
-                form.cleaned_data["nombre"] = form.cleaned_data["nombre"].upper()
-
-                # capitalizamos el apellido_paterno
-                form.cleaned_data["apellido_paterno"] = form.cleaned_data["apellido_paterno"].upper()
-
-                # capitalizamos el apellido_materno
-                form.cleaned_data["apellido_materno"] = form.cleaned_data["apellido_materno"].upper()
-                
-                if form.cleaned_data["curp"]:
-                    # colocamos la curp en mayusculas
-                    form.cleaned_data["curp"] = form.cleaned_data["curp"].upper()
-
-                if form.cleaned_data["clave_elector"]:
-                    # colocamos la clave_elector en mayusculas
-                    form.cleaned_data["clave_elector"] = form.cleaned_data["clave_elector"].upper()
-
+                # obtenemos una instancia temporal normalizada de contacto
                 contacto = form.save(commit=False)
                 # ------------------- CONTACTOS REPETIDOS -----------------------------
                 
@@ -129,8 +112,19 @@ def editarContacto(request, id_contacto):
                     messages.warning(request, "Se encontraron contactos con coincidencias en la informacion ingresada.")
                     # serializamos informacion del form
                     contacto_cleaned_data = form.cleaned_data
+
+                    if contacto.seccion:
+                        # insertamos solo llave foranea de la seccion
+                        contacto_cleaned_data['seccion'] = contacto.seccion.pk
+
+                    if contacto.parent:
+                        # insertamos solo llave foranea del contacto asociado
+                        contacto_cleaned_data['parent'] = contacto.parent.pk
+
                     # guardamos la informacion en la sesion
                     request.session['datos_contacto'] = contacto_cleaned_data
+                    # guardamos el id de contacto
+                    request.session['id_contacto'] = contacto.id
                     # si existen contactos repetidos redirigir a manejarDuplicados
                     return redirect("contactos:manejarDuplicados")
                 
@@ -200,51 +194,23 @@ def manejarDuplicado(request):
             # si la informacion insertada es valida
             # alamacenamos las respuestas en una instancia temporal
 
-            # capitalizamos el nombre 
-            form.cleaned_data["nombre"] = form.cleaned_data["nombre"].upper()
+            # obtenemos una instancia temporal
+            form.save()
 
-            # capitalizamos el apellido_paterno
-            form.cleaned_data["apellido_paterno"] = form.cleaned_data["apellido_paterno"].upper()
+            if request.session.get("id_contacto"):
+                # borramos el id de contacto de la sesion
+                del request.session["id_contacto"]
 
-            # capitalizamos el apellido_materno
-            form.cleaned_data["apellido_materno"] = form.cleaned_data["apellido_materno"].upper()
-            
-            if form.cleaned_data["curp"]:
-                # colocamos la curp en mayusculas
-                form.cleaned_data["curp"] = form.cleaned_data["curp"].upper()
+            if request.session.get("datos_contacto"):
+                # borramos los datos de contacto de la sesion
+                del request.session["datos_contacto"]
 
-            if form.cleaned_data["clave_elector"]:
-                # colocamos la clave_elector en mayusculas
-                form.cleaned_data["clave_elector"] = form.cleaned_data["clave_elector"].upper()
-
-            contacto = form.save(commit=False)
-            # ------------------- CONTACTOS REPETIDOS -----------------------------
-            
-            if existenCoincidencias(contacto):
-                # si existe una coincidencia
-                messages.warning(request, "Se encontraron contactos con coincidencias en la informacion ingresada.")
-                # serializamos informacion del form
-                contacto_cleaned_data = form.cleaned_data
-                # guardamos la informacion en la sesion
-                request.session['datos_contacto'] = contacto_cleaned_data
-                # si existen contactos repetidos redirigir a manejarDuplicados
-                return redirect("contactos:manejarDuplicados")
-            
-            else:
-                # si ya no existen coincidencias
-                # almacenamos los cambios
-                contacto.save()
-
-                if request.session.get("id_contacto"):
-                    # borramos el id de contacto de la sesion
-                    del request.session["id_contacto"]
-
-                if request.session.get("datos_contacto"):
-                    # borramos los datos de contacto de la sesion
-                    del request.session["datos_contacto"]
-
-                messages.success(request, f"Informacion de contacto ingresada con exito!")
-                return redirect("contactos:mostrarPerfilContacto", id_contacto=contacto.pk)
+            messages.info(request, f"Informacion de contacto ingresada con exito!.")
+            return redirect("contactos:mostrarPerfilContacto", id_contacto=contacto.pk)
+        
+        else:
+            # el fomulario presenta errores
+            messages.error(request, "La informacion ingresada no fue validada.")
 
     
     else:

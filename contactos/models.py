@@ -57,6 +57,46 @@ class Contacto(MPTTModel):
     class MPTTMeta:
         order_insertion_by = ['apellido_paterno']
 
+    def clean_nombre(self):
+        # al guardar convierte el nombre a mayusculas
+        valor = self.cleaned_data['nombre']
+        # convertimos el campo a mayusculas
+        valor = valor.upper()
+        # devuelve el valor ya en mayusculas
+        return valor
+    
+    def clean_apellido_paterno(self):
+        # al guardar convierte el apellido a mayusculas
+        valor = self.cleaned_data['apellido_paterno']
+        # convertimos el campo a mayusculas
+        valor = valor.upper()
+        # devuelve el valor ya en mayusculas
+        return valor
+
+    def clean_apellido_materno(self):
+        # al guardar convierte el apellido a mayusculas
+        valor = self.cleaned_data['apellido_materno']
+        # convertimos el campo a mayusculas
+        valor = valor.upper()
+        # devuelve el valor ya en mayusculas
+        return valor
+    
+    def clean_curp(self):
+        # al guardar convierte la curp a mayusculas
+        valor = self.cleaned_data['curp']
+        # convertimos el campo a mayusculas
+        valor = valor.upper()
+        # devuelve el valor ya en mayusculas
+        return valor
+    
+    def clean_clave_elector(self):
+        # al guardar convierte la curp a mayusculas
+        valor = self.cleaned_data['clave_elector']
+        # convertimos el campo a mayusculas
+        valor = valor.upper()
+        # devuelve el valor ya en mayusculas
+        return valor
+
     def save(self, *args, **kwargs):
         # en caso de no contar con seccion se asigna una por defecto
         

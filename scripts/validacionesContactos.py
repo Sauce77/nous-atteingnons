@@ -42,7 +42,7 @@ def existenCoincidencias(c):
 
     # CASO 4: Coincidencias de Telefono
     if c.telefono:
-        coincidencias = base_filtro.filter(Q(telefono_iexact=c.telefono))
+        coincidencias = base_filtro.filter(Q(telefono__iexact=c.telefono))
 
         if coincidencias.exists():
             return True
@@ -95,3 +95,31 @@ def filtrarContactosDuplicados(c):
     # NO son el contacto actual.
 
     return coincidencias
+
+def normalizarDatosContacto(form):
+    """
+        Recibe un form ya validado y normaliza los campos de nombre,
+        apellidos, curp y clave de elector.
+
+        Retorna una instancia temporal validada de Contacto.
+    """
+    # normalizamos el nombre 
+    form.cleaned_data["nombre"] = form.cleaned_data["nombre"].upper()
+
+    # normalizamos el apellido_paterno
+    form.cleaned_data["apellido_paterno"] = form.cleaned_data["apellido_paterno"].upper()
+
+    # normalizamos el apellido_materno
+    form.cleaned_data["apellido_materno"] = form.cleaned_data["apellido_materno"].upper()
+    
+    if form.cleaned_data["curp"]:
+        # colocamos la curp en mayusculas
+        form.cleaned_data["curp"] = form.cleaned_data["curp"].upper()
+
+    if form.cleaned_data["clave_elector"]:
+        # colocamos la clave_elector en mayusculas
+        form.cleaned_data["clave_elector"] = form.cleaned_data["clave_elector"].upper()
+
+    contacto = form.save(commit=False)
+
+    return contacto

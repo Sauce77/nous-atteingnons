@@ -61,7 +61,11 @@
         <label for="{{ form.domicilio.id_for_label }}">Domicilio</label>
     </div><!-- input domicilio -->
 
-    <input type="submit" id="btnAceptar" class="btn btn-primary" value="Aceptar">
-
+    <input type="submit" name="btnSubmitContacto" class="btn btn-primary" value="Aceptar">
+    {% if contacto %}
+        <a href="{% url 'contactos:mostrarPerfilContacto' id_contacto=contacto.pk %}" class="btn btn-danger text-decoration-none text-white">Cancelar</a>
+    {% else %}
+        <a href="{% url 'contactos:mostrarContactos' %}" class="btn btn-danger text-decoration-none text-white">Cancelar</a>
+    {% endif %}
 
 </form>
