@@ -165,7 +165,7 @@ def mostrarPerfilContacto(request, id_contacto):
         # obtenemos btnBorrarContacto
         btnBorrarContacto = request.POST.get('btnBorrarContacto')
         # obtenemos btnAfiliacion
-        btnAfiliciacion = request.POST.get('btnAfilicion')
+        btnAfiliacion = request.POST.get('btnAfiliacion')
 
         if btnBorrarContacto == "Borrar":
             # obtenemos id del contacto
@@ -178,6 +178,19 @@ def mostrarPerfilContacto(request, id_contacto):
 
             else:
                 messages.warning(request, "Este contacto mantiene relaciones registradas. Considere marcar el contacto como 'Desafiliado' o modifique los contactos relacionados.")
+
+        elif btnAfiliacion == "Afiliado":
+            # cambiamos el estado a desafiliado
+            contacto.estatus = "D"
+            contacto.save()
+            messages.info(request, f"El estatus del contacto cambio a 'Desafiliado'")
+
+        elif btnAfiliacion == "Desafiliado":
+            # cambiamos el estado a desafiliado
+            contacto.estatus = "A"
+            contacto.save()
+            messages.info(request, f"El estatus del contacto cambio a 'Afiliado'")
+
 
     contexto = {
         "contacto": contacto,

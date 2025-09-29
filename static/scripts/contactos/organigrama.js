@@ -11,6 +11,17 @@ function drawChart() {
       dataTable.addColumn('string', 'Name');
       dataTable.addColumn('string', 'Manager');
       dataTable.addColumn('string', 'ToolTip');
+      dataTable.addColumn('string', 'Color')
+
+      var opciones = {
+        minColor: '#FF0000', // Rojo
+        maxColor: '#0073FF', // Azul
+      }
+
+      const colorMap = {
+          'A': 1, // afiliado
+          'D': 0, // desafiliado
+      };
       
       let allRows = [];
       processNode(data, allRows, ''); 
@@ -58,7 +69,7 @@ function processNode(node, allRows, parentId) {
   allRows.push([
     nodeData,
     parentId,
-    `Contactos: ${node.descendant_count}`
+    `Contactos: ${node.descendant_count}`,
   ]);
   
   if (node.children && node.children.length > 0) {
