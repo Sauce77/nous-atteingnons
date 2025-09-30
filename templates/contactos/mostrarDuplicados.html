@@ -3,6 +3,12 @@
 {% block content %}
     <h1>{{ titulo }}</h1>
 
+    {% if id_contacto %}
+        <p>{{ id_contacto }}</p>
+    {% else %}
+        <p>Estas insertando wey</p>
+    {% endif %}
+
     <div class="row my-2">
         <div class="col-lg-4 border-end">
             <p>¿Desea conservar este contacto?</p>

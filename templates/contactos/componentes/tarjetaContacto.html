@@ -17,7 +17,7 @@
         {% endif %}
     </div>
 
-    <div class="col-md-10">
+    <div class="col-md-8">
       <div class="card-body">
         <h3 class="card-title ">{{ contacto.nombre }} {{ contacto.apellido_paterno }} {{ contacto.apellido_materno }}</h3>
         {% if contacto.parent %}
@@ -100,17 +100,32 @@
             
             <form method="post">
                 {% csrf_token %}
-                {% if contacto.estatus == "A" %}
-                    <input type="submit" name="btnAfiliacion" class="btn btn-primary" value="Afiliado">
-                {% else %}
-                    <input type="submit" name="btnAfiliacion" class="btn btn-danger" value="Desafiliado">
-                {% endif %}
+                <p>
+                    <b>Estatus: </b>
+                    {% if contacto.estatus == "A" %}
+                        <input type="submit" name="btnAfiliacion" class="btn btn-primary" value="Afiliado" title="Cambiar estatus">
+                    {% else %}
+                        <input type="submit" name="btnAfiliacion" class="btn btn-danger" value="Desafiliado" title="Cambiar estatus">
+                    {% endif %}
+                </p>
             </form>
-            <a href="{% url 'contactos:editarContacto' id_contacto=contacto.pk %}" class="btn btn-secondary text-decoration-none text-white">Editar</a>
+            
         </div>
 
-      </div>
+      </div><!-- div card body -->
+
     </div><!-- info contacto -->
+
+    <div class="col-md-2 p-3">
+        <form method="post">
+            {% csrf_token %}
+            <div class="d-grid gap-2">
+                <a href="{% url 'contactos:subirContactos' id_contacto=contacto.pk %}" class="btn btn-primary text-decoration-none text-white" title="Subir archivo de contactos">Subir Contactos</a>
+                <a href="{% url 'contactos:editarContacto' id_contacto=contacto.pk %}" class="btn btn-secondary text-decoration-none text-white" title="Editar contacto">Editar</a>
+                <button type="submit" name="btnDescargarExcel" class="btn btn-success" value="Descargar" title="Descargar lista de contactos">Descargar</button>
+            </div>
+        </form>
+    </div>
 
   </div><!-- div row -->
 </div><!-- tarjeta de contacto -->

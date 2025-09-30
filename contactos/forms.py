@@ -47,3 +47,14 @@ class ContactoForm(forms.ModelForm):
             'seccion': SeccionWidget(attrs={"class": "form-select", "data-placeholder": "Buscar seccion..."}),
             'parent': ContactoAsociadoWidget(attrs={"class": "form-select", 'data-allow-clear': 'false', "data-placeholder": "Buscar un contacto..."}),
         }
+
+
+class ExcelForm(forms.Form):
+    """
+        Utilizado para mostrar un espacio e insertar
+        un archivo Excel.
+    """
+    archivo = forms.FileField(
+        label='Seleccione un archivo Excel...',
+        help_text='Solo se permiten archivos con extension .xlsx, .xls'
+    )

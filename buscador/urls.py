@@ -17,9 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from contactos.views import home
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("select2/", include("django_select2.urls")),
     path('contactos/', include('contactos.urls')),
     path('api/', include('api.urls')),
+    path('', home, name="home"),
 ]
