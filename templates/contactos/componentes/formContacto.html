@@ -1,5 +1,5 @@
 {% block headers %}
-    {{ form.media }}
+    {{ form.media.css }}
 {% endblock %}
 
 <!-- form para insertar contacto -->
@@ -69,3 +69,6 @@
     {% endif %}
 
 </form>
+
+
+{{ form.media.js }}
