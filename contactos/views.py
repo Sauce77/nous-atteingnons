@@ -390,3 +390,11 @@ def subirContactos(request, id_contacto):
         "contactos": contactos_creados, 
     }
     return render(request, "contactos/subirContactos.html", contexto)
+
+
+def home(request):
+    """
+        Renderiza el inicio de la aplicacion.
+    """
+
+    return render(request, "core/home.html")
