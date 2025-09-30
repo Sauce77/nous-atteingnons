@@ -9,6 +9,7 @@ a = Analysis(
     pathex=[],
     binaries=[],
     datas=[
+        ('buscador', 'buscador')
         ('db.sqlite3', '.'),
         ('staticfiles_collected', 'staticfiles_collected'),
         ('static', 'static'),

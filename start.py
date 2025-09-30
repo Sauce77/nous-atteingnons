@@ -8,7 +8,7 @@ import time
 # --- 1. CONFIGURACIÓN DEL ENTORNO ---
 # Establece la configuración de Django
 # Reemplaza 'mi_proyecto.settings' con la ruta real a tu settings.py
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'buscador/settings.py')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'buscador.settings')
 
 # Define el puerto y la dirección
 HOST = '127.0.0.1'
