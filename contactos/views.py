@@ -376,7 +376,7 @@ def subirContactos(request, id_contacto):
 
                 # creamos contactos
                 contactos_creados = insertarContactosExcel(df_archivo, contacto)
-                messages.success(request, f"Se han insertado {len(contactos_creados)} contactos.")
+                messages.info(request, f"Se han insertado {len(contactos_creados)} contacto(s).")
 
             else:
                 messages.error(request, "El archivo ingresado no pudo ser validado.")

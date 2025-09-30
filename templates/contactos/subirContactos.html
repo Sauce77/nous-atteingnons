@@ -6,6 +6,8 @@
         {{ contacto.apellido_paterno }} {{ contacto.apellido_materno }}, {{ contacto.nombre }}</a>
     </h3>
 
+    <p>Cargue un archivo de Excel para insertar contactos.</p>
+
     <div class="d-flex flex-row">
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
