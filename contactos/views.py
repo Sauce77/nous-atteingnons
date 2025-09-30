@@ -255,12 +255,38 @@ def manejarDuplicado(request):
     # obtenemos id del contacto
     id_contacto = request.session.get('id_contacto')
 
-    if id_contacto:
-        # obtenemos objeto del contacto
-        contacto = get_object_or_404(Contacto, pk=id_contacto)
-    elif datos_contacto:
+    if datos_contacto:
+
+        # incializamos seccion y contacto_asociado
+        seccion = None
+        contacto_asociado = None
+
+        if datos_contacto["seccion"]:
+            # obtenemos numero seccion
+            numero_seccion = datos_contacto["seccion"]
+            # obtenemos seccion
+            seccion = get_object_or_404(Seccion, pk=numero_seccion)
+            # retiramos seccion de los datos
+            datos_contacto["seccion"] = None
+
+        if datos_contacto["parent"]:
+            # obtenemos con id de contacto asociado
+            id_contacto_asociado = datos_contacto["parent"]
+            # obtenemos objeto contacto asociado
+            contacto_asociado = get_object_or_404(Contacto, pk=id_contacto_asociado)
+            # retiramos contacto asociado de los datos
+            datos_contacto["parent"] = None
+        
         # creamos una instancia de contacto
         contacto = Contacto(**datos_contacto)
+
+        if seccion:
+            # actualizamos la seccion del contacto
+            contacto.seccion = seccion
+        
+        if contacto_asociado:
+            # actualizamos el contacto asociado del contacto
+            contacto.parent = contacto_asociado
     else:
         contexto = {
             "titulo": "No se pudo encontrar informacion.",
@@ -270,6 +296,10 @@ def manejarDuplicado(request):
         return render(request, "core/error.html", contexto)
 
     if request.method == "POST":
+
+        if id_contacto:
+            # obtenemos objeto del contacto
+            contacto = get_object_or_404(Contacto, pk=id_contacto)
         
         form = ContactoForm(request.POST, instance=contacto)
 
@@ -304,6 +334,7 @@ def manejarDuplicado(request):
     
     contexto = {
         "form": form,
+        "id_contacto": id_contacto,
         "contactos": coincidencias,
     }
 
