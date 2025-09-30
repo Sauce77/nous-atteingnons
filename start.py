@@ -1,9 +1,16 @@
 import os
+
+# Esto puede mitigar problemas de concurrencia y rastreo de CPU en entornos virtualizados.
+os.environ['OMP_NUM_THREADS'] = '1' 
+os.environ['OPENBLAS_NUM_THREADS'] = '1'
+os.environ['MKL_NUM_THREADS'] = '1'
+
 import sys
 from django.core.management import execute_from_command_line
 import webbrowser
 import threading
 import time
+import traceback
 
 # --- 1. CONFIGURACIÓN DEL ENTORNO ---
 # Establece la configuración de Django
@@ -32,7 +39,10 @@ def run_django_server():
             '--nothreading',
         ])
     except Exception as e:
-        print(f"Error al iniciar el servidor Django: {e}")
+        print("\n--- ERROR CRÍTICO ---")
+        traceback.print_exc() # Muestra la traza completa
+        input("\nPresiona ENTER para cerrar la ventana...") # Mantiene la ventana abierta
+        sys.exit(1)
 
 def open_browser_delay():
     """Espera un momento para asegurar que el servidor esté activo antes de abrir el navegador."""

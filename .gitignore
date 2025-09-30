@@ -420,3 +420,5 @@ FodyWeavers.xsd
 
 # base de datos
 db.sqlite3
+
+/staticfiles_collected/
