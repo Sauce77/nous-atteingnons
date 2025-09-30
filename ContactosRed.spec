@@ -9,11 +9,11 @@ a = Analysis(
     pathex=[],
     binaries=[],
     datas=[
-        ('Codigo/db.sqlite3', '.'),
-        ('Codigo/staticfiles_collected', 'staticfiles_collected'),
-        ('Codigo/static', 'static'),
-        ('Codigo/templates', 'templates'),
-        ('Codigo/scripts', 'scripts'),
+        ('db.sqlite3', '.'),
+        ('staticfiles_collected', 'staticfiles_collected'),
+        ('static', 'static'),
+        ('templates', 'templates'),
+        ('scripts', 'scripts'),
     ],
     hiddenimports=[
         'django.contrib.admin',
@@ -43,7 +43,7 @@ exe = EXE(
     pyz,
     a.scripts,
     a.binaries,
-    a.zipfiles
+    a.zipfiles,
     a.datas,
     [],
     exclude_binaries=True,
