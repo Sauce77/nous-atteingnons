@@ -10,4 +10,5 @@ urlpatterns = [
     path("insertar/", views.insertarContacto, name="insertarContacto"),
     path("editar/<int:id_contacto>/", views.editarContacto, name="editarContacto"),
     path("duplicados/", views.manejarDuplicado, name="manejarDuplicados"),
+    path("subir/<int:id_contacto>", views.subirContactos, name="subirContactos"),
 ]

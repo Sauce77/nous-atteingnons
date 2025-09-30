@@ -3,13 +3,15 @@ from django.urls import reverse
 from django.contrib import messages
 from django.db.models import F
 
+import openpyxl
+
 from scripts.validacionesContactos import filtrarContactosDuplicados, existenCoincidencias
-from scripts.operacionesContactos import borrarContacto, obtenerDescendientesPlano
+from scripts.operacionesContactos import borrarContacto, obtenerDescendientesPlano, insertarContactosExcel
 
 import pandas as pd
 
 from .models import Contacto, Seccion
-from .forms import ContactoForm
+from .forms import ContactoForm, ExcelForm
 # Create your views here.
 
 def mostrarContactos(request):
@@ -207,7 +209,7 @@ def mostrarPerfilContacto(request, id_contacto):
             if datos:
 
                 # archivo de salida
-                nombre_archivo_salida = f'Contactos-{contacto.apellido_paterno}-{contacto.apellido_materno}-{contacto.nombre}.xlsx'
+                nombre_archivo_salida = f'Contactos_{contacto.apellido_paterno}_{contacto.apellido_materno}_{contacto.nombre}.xlsx'
                 
                 df = pd.DataFrame(datos)
         
@@ -340,3 +342,51 @@ def manejarDuplicado(request):
 
     return render(request, "contactos/mostrarDuplicados.html", contexto)
 
+def subirContactos(request, id_contacto):
+    """
+        A partir de un archivo de Excel, asigna los nuevos registros como
+        contactos asociados del contacto elegido.
+    """
+
+    # obtenemos contacto
+    contacto = get_object_or_404(Contacto, pk=id_contacto)
+
+    # inicializamos contactos creados
+    contactos_creados = None
+
+    if request.method == "POST":
+        # obtenemos boton btnSubirContactos
+        btnSubirContactos = request.POST.get("btnSubirContactos")
+
+        if btnSubirContactos == "Subir":
+
+            form = ExcelForm(request.POST, request.FILES)
+
+            if form.is_valid():
+                # obtenemos el archivo subido
+                archivo_excel = request.FILES["archivo"]
+
+                try:
+                    archivo = openpyxl.load_workbook(archivo_excel)
+                except Exception:
+                    messages.error(request, "El archivo subido no es compatible con Excel. Revise que la extension del archivo sea .xlsx o .xls")
+                
+                # leemos el archivo en un dataframe
+                df_archivo = pd.read_excel(archivo_excel, engine='openpyxl')
+
+                # creamos contactos
+                contactos_creados = insertarContactosExcel(df_archivo, contacto)
+                messages.success(request, f"Se han insertado {len(contactos_creados)} contactos.")
+
+            else:
+                messages.error(request, "El archivo ingresado no pudo ser validado.")
+            
+    else:
+        form = ExcelForm()
+
+    contexto = {
+        "form": form,
+        "contacto": contacto,
+        "contactos": contactos_creados, 
+    }
+    return render(request, "contactos/subirContactos.html", contexto)
