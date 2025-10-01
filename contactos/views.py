@@ -251,6 +251,8 @@ def manejarDuplicado(request):
         la informacion ingresada para evitar duplicados.
     """
 
+    return HttpResponse("Coincidencias")
+
     # obtenemos los datos del contacto
     datos_contacto = request.session.get('datos_contacto')
 
@@ -298,10 +300,6 @@ def manejarDuplicado(request):
         return render(request, "core/error.html", contexto)
 
     if request.method == "POST":
-
-        if id_contacto:
-            # obtenemos objeto del contacto
-            contacto = get_object_or_404(Contacto, pk=id_contacto)
         
         form = ContactoForm(request.POST, instance=contacto)
 
