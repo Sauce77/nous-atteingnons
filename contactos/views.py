@@ -45,7 +45,7 @@ def insertarContacto(request):
 
             if form.is_valid():
                 # si la informacion es correcta
-                # alamacenamos las respuestas en una instancia temporal
+                # almacenamos las respuestas en una instancia temporal
 
                 # obtenemos una instancia temporal normalizada de contacto
                 contacto = form.save(commit=False)
@@ -251,6 +251,8 @@ def manejarDuplicado(request):
         la informacion ingresada para evitar duplicados.
     """
 
+    return HttpResponse("Coincidencias")
+
     # obtenemos los datos del contacto
     datos_contacto = request.session.get('datos_contacto')
 
@@ -298,10 +300,6 @@ def manejarDuplicado(request):
         return render(request, "core/error.html", contexto)
 
     if request.method == "POST":
-
-        if id_contacto:
-            # obtenemos objeto del contacto
-            contacto = get_object_or_404(Contacto, pk=id_contacto)
         
         form = ContactoForm(request.POST, instance=contacto)
 
@@ -376,7 +374,7 @@ def subirContactos(request, id_contacto):
 
                 # creamos contactos
                 contactos_creados = insertarContactosExcel(df_archivo, contacto)
-                messages.success(request, f"Se han insertado {len(contactos_creados)} contactos.")
+                messages.info(request, f"Se han insertado {len(contactos_creados)} contacto(s).")
 
             else:
                 messages.error(request, "El archivo ingresado no pudo ser validado.")
