@@ -45,7 +45,7 @@ def insertarContacto(request):
 
             if form.is_valid():
                 # si la informacion es correcta
-                # alamacenamos las respuestas en una instancia temporal
+                # almacenamos las respuestas en una instancia temporal
 
                 # obtenemos una instancia temporal normalizada de contacto
                 contacto = form.save(commit=False)
