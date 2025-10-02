@@ -70,12 +70,12 @@ def insertarContacto(request):
                     # guardamos el id de contacto como nulo
                     request.session['id_contacto'] = None
                     # si existen contactos repetidos redirigir a manejarDuplicados
-                    return redirect("contactos:manejarDuplicados")
+                    return redirect("contactos:insertarDuplicados")
                 
                 else:
                     # guardamos los cambios realizados
                     contacto.save()
-                    messages.success(request, f"Nuevo contacto ingresado con exito!")
+                    messages.success(request, f"{contacto.apellido_paterno} {contacto.apellido_materno}, {contacto.nombre} ingresado con exito!")
                     return redirect("contactos:mostrarPerfilContacto", id_contacto=contacto.pk)
 
             else:
@@ -134,7 +134,8 @@ def editarContacto(request, id_contacto):
                     # guardamos el id de contacto
                     request.session['id_contacto'] = contacto.id
                     # si existen contactos repetidos redirigir a manejarDuplicados
-                    return redirect("contactos:manejarDuplicados")
+                    # return redirect("contactos:manejarDuplicados")
+                    return HttpResponse("EDITAR DUPLICADOS")
                 
                 else:
                     # guardamos los cambios realizados
@@ -244,52 +245,51 @@ def mostrarPerfilContacto(request, id_contacto):
 
     return render(request, "contactos/mostrarPerfilContacto.html", contexto)
 
-
-def manejarDuplicado(request):
+def insertarDuplicado(request):
     """
-        Al encontrar un registro con coincidencias, esta vista permite corregir
-        la informacion ingresada para evitar duplicados.
+        Al insertar un nuevo contacto, existe una coincidencia.
+        Se muestran las coincidencias.
     """
 
-    # incializamos form
-    form = None
+    # obtenemos datos del contacto
+    datos_contacto = request.session["datos_contacto"]
 
-    # inicializamos coincidencias
-    coincidencias = None
-
-    # inicializamos contacto
-    contacto = None
-
-    # obtenemos los datos del contacto
-    datos_contacto = request.session.get('datos_contacto')
-
-    # obtenemos id del contacto
-    id_contacto = request.session.get('id_contacto')
-
-    if id_contacto:
-        # si existe id
-        contacto = get_object_or_404(Contacto, pk=id_contacto)
-    else:
-        contacto = Contacto(**datos_contacto)
-
-
-    if request.method == 'POST':
+    if request.method == "POST":
         # obtenemos btnSubmitContacto
         btnSubmitContacto = request.POST.get('btnSubmitContacto')
-    
-    else:
-        form=ContactoForm(instance=contacto, initial=datos_contacto)
 
-    # obtenemos las coincidencias encontradas
+        if btnSubmitContacto == "Aceptar":
+
+            # cargamos el form con los datos ingresados
+            form = ContactoForm(request.POST)
+
+            if form.is_valid():
+                # si la informacion es validada
+                contacto = form.save()
+                messages.success(request, f"{contacto.apellido_paterno} {contacto.apellido_materno}, {contacto.nombre} ingresado con exito!")
+                return redirect("contactos:mostrarPerfilContacto", id_contacto=contacto.pk)
+            else:
+                messages.error("La informacion insertada no pudo ser validada. Intente de nuevo.")
+                return redirect("contactos:mostrarContactos")
+
+    else:
+        form = ContactoForm(initial=datos_contacto)
+
+    # creamos instancia de contacto
+    contacto = Contacto(**datos_contacto)
+    # obtenemos coincidencias
     coincidencias = filtrarContactosDuplicados(contacto)
-    
+
+
     contexto = {
-        "form": form,
-        "id_contacto": id_contacto,
+        "contacto": contacto,
         "contactos": coincidencias,
+        "form": form,
     }
 
     return render(request, "contactos/mostrarDuplicados.html", contexto)
+
+
 
 def subirContactos(request, id_contacto):
     """

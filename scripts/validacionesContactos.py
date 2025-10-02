@@ -56,7 +56,7 @@ def filtrarContactosDuplicados(c):
 
     coincidencias = contactos.filter(
         # caso 1: nombre y apellido
-        ( Q(nombre__iexact=c.nombre) &
+        (Q(nombre__iexact=c.nombre) &
          Q(apellido_paterno__iexact=c.apellido_paterno) &
          Q(apellido_materno__iexact=c.apellido_materno)) |
         # caso 2: curp

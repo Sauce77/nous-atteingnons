@@ -62,7 +62,7 @@
     </div><!-- input domicilio -->
 
     <input type="submit" name="btnSubmitContacto" class="btn btn-primary" value="Aceptar">
-    {% if contacto %}
+    {% if contacto.pk %}
         <a href="{% url 'contactos:mostrarPerfilContacto' id_contacto=contacto.pk %}" class="btn btn-danger text-decoration-none text-white">Cancelar</a>
     {% else %}
         <a href="{% url 'contactos:mostrarContactos' %}" class="btn btn-danger text-decoration-none text-white">Cancelar</a>
