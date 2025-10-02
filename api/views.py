@@ -64,3 +64,16 @@ class ContactoPlanoView(APIView):
         
         # 4. Devolver la respuesta
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class TodosContactosView(APIView):
+
+    def get(self, request, format=None):
+
+        
+        descendants_queryset = Contacto.objects.all()
+
+        # 3. Serializar el QuerySet
+        serializer = ContactSerializer(descendants_queryset, many=True)
+        
+        # 4. Devolver la respuesta
+        return Response(serializer.data, status=status.HTTP_200_OK)
