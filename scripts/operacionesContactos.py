@@ -29,7 +29,7 @@ def borrarContacto(id_contacto):
     return False
 
 
-def obtenerDescendientesPlano(api_url ,contacto):
+def obtenerDescendientesPlano(api_url):
     """
         A partir de los descendientes de un contactos, muestra la informacion
         en un excel.

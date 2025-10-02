@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.db.models import F
 
 import openpyxl
+import datetime
 
 from scripts.validacionesContactos import filtrarContactosDuplicados, existenCoincidencias
 from scripts.operacionesContactos import borrarContacto, obtenerDescendientesPlano, insertarContactosExcel
@@ -19,6 +20,50 @@ def mostrarContactos(request):
         Despliega los contactos disponibles para un contacto en especifico.
     """
     
+    if request.method == "POST":
+        # obtenemos btnDescargarExcel
+        btnDescargarExcel = request.POST.get('btnDescargarExcel')
+
+        if btnDescargarExcel == "Descargar":
+
+            # obtenemos url para descencdientes
+            api_url = reverse("api:mostrarTodosContactos")
+
+            url_absoluta = request.build_absolute_uri(api_url)
+
+            datos = obtenerDescendientesPlano(url_absoluta)
+
+            if datos:
+                # obtenemos tiempo actual
+                tiempo_actual = datetime.datetime.today()
+                
+                # archivo de salida
+                nombre_archivo_salida = f'Contactos_{tiempo_actual.day}_{tiempo_actual.month}_{tiempo_actual.year}.xlsx'
+                
+                df = pd.DataFrame(datos)
+        
+                # 3. Crear el objeto HttpResponse de Django
+                # Especificamos el Content-Type para un archivo Excel (.xlsx)
+                response = HttpResponse(
+                    content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                )
+                
+                # 4. Configurar la cabecera Content-Disposition
+                # 'attachment' indica al navegador que descargue el archivo.
+                # 'filename' especifica el nombre del archivo que se descargará.
+                response['Content-Disposition'] = f'attachment; filename="{nombre_archivo_salida}"'
+                
+                # 5. Guardar el DataFrame directamente en el objeto HttpResponse
+                # Usamos BytesIO (proceso interno de to_excel) para no escribir el archivo en disco.
+                df.to_excel(response, index=False, sheet_name='Datos Aplanados')
+                
+                # 6. Devolver la respuesta al navegador
+                messages.success(request, f"Se ha completado la descarga {nombre_archivo_salida}")
+                return response
+            
+            else:
+                messages.error(request, "Hubo un problema al descargar el archivo.")
+
     # obtenemos contactos
     contactos = Contacto.objects.all()
 
@@ -203,7 +248,7 @@ def mostrarPerfilContacto(request, id_contacto):
 
             url_absoluta = request.build_absolute_uri(api_url)
 
-            datos = obtenerDescendientesPlano(url_absoluta, contacto)
+            datos = obtenerDescendientesPlano(url_absoluta)
 
             if datos:
 
@@ -420,4 +465,34 @@ def home(request):
         Renderiza el inicio de la aplicacion.
     """
 
-    return render(request, "core/home.html")
+    # obtenemos el total de contactos registrados
+    contactos_registrados = Contacto.objects.count()
+
+    # obtenemos el total de contactos afiliados
+    contactos_afiliados = Contacto.objects.filter(estatus='A').count()
+
+    # obtenemos el total de contactos del mes
+    contactos_del_mes = 5
+
+    # obtenemos el total de contactos desafiliados
+    contactos_desafiliados = Contacto.objects.filter(estatus='D').count()
+
+    # obtenemos diez contactos con mayor alcance
+    contactos_alcance = Contacto.objects.annotate(
+            num_descendientes= (F('rght') - F('lft') - 1) / 2
+        ).order_by('-num_descendientes')[:10]
+    
+    # obtenemos diez contactos recientes
+    contactos_recientes = Contacto.objects.order_by('-fecha_modificacion')[:10]
+
+    contexto ={
+        "contactos_registrados": contactos_registrados,
+        "contactos_afiliados": contactos_afiliados,
+        "contactos_del_mes": contactos_del_mes,
+        "contactos_desafiliados": contactos_desafiliados,
+        "contactos_alcance": contactos_alcance,
+        "contactos_recientes": contactos_recientes,
+    }
+
+
+    return render(request, "core/home.html", contexto)
