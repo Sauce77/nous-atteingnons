@@ -12,9 +12,10 @@ def existenCoincidencias(c):
     coincidencias = Contacto.objects.all()
 
     if c.pk:
-        # si el usuario ya esta registrado
+        # si el contacto ya esta registrado
         coincidencias = Contacto.objects.exclude(pk=c.pk)
 
+    # CASO 1: Nombre y Apellidos
     if coincidencias.filter(apellido_paterno__iexact=c.apellido_paterno,
                                apellido_materno__iexact=c.apellido_materno,
                                nombre__iexact=c.nombre,
@@ -23,23 +24,20 @@ def existenCoincidencias(c):
     
     # CASO 2: CURP
     if c.curp:
-        caso = coincidencias.filter(curp__iexact=c.curp)
 
-        if caso.exists():
+        if coincidencias.filter(curp=c.curp).exists():
             return True
         
     # CASO 3: Clave Elector
     if c.clave_elector:
-        caso = coincidencias.filter(clave_elector__iexact=c.clave_elector)
 
-        if caso.exists():
+        if coincidencias.filter(clave_elector=c.clave_elector).exists():
             return True
 
     # CASO 4: Telefono
     if c.telefono:
-        caso = coincidencias.filter(telefono=c.telefono)
 
-        if caso.exists():
+        if coincidencias.filter(telefono=c.telefono).exists():
             return True
 
     return False
@@ -50,37 +48,28 @@ def filtrarContactosDuplicados(c):
         informacion del contacto a insertar/modificar.
     """
 
-    coincidencias = Contacto.objects.none()
-
-    # CASO 1: Nombre y apellidos
-    caso = coincidencias.filter(nombre__iexact=c.nombre).filter(apellido_paterno=c.apellido_paterno).filter(apellido_materno=c.apellido_materno)
-
-    if caso.exists():
-        coincidencias = coincidencias.union(caso)
-    
-    # CASO 2: CURP
-    if c.curp:
-        caso = coincidencias.filter(curp__iexact=c.curp)
-
-        if caso.exists():
-            coincidencias = coincidencias.union(caso)
-        
-    # CASO 3: Clave Elector
-    if c.clave_elector:
-        caso = coincidencias.filter(clave_elector__iexact=c.clave_elector)
-
-        if caso.exists():
-            coincidencias = coincidencias.union(caso)
-
-    # CASO 4: Telefono
-    if c.telefono:
-        caso = coincidencias.filter(telefono=c.telefono)
-
-        if caso.exists():
-            coincidencias = coincidencias.union(caso)
+    contactos = Contacto.objects.all()
 
     if c.pk:
-        coincidencias = coincidencias.exclude(pk=c.pk)
+        # si el contacto esta registrado
+        contactos = Contacto.objects.exclude(pk=c.pk)
+
+    print(c.pk, c.nombre, c.apellido_paterno, c.apellido_materno, c.telefono, c.curp, c.clave_elector, c.seccion, c.parent)
+
+    coincidencias = contactos.filter(
+        # caso 1: nombre y apellido
+        (Q(nombre__iexact=c.nombre) &
+         Q(apellido_paterno__iexact=c.apellido_paterno) &
+         Q(apellido_materno__iexact=c.apellido_materno)) |
+        # caso 2: curp
+        (Q(curp=c.curp) & Q(curp__isnull=False)) |
+        # caso 3: clave_elector
+        (Q(clave_elector=c.clave_elector) & Q(clave_elector__isnull=False)) |
+        # caso 4: telefono
+        (Q(telefono=c.telefono) & Q(telefono__isnull=False))
+    )
+
+    print(len(coincidencias))
 
     return coincidencias
     

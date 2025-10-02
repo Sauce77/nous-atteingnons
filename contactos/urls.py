@@ -9,6 +9,7 @@ urlpatterns = [
     path("perfil/<int:id_contacto>/", views.mostrarPerfilContacto, name="mostrarPerfilContacto"),
     path("insertar/", views.insertarContacto, name="insertarContacto"),
     path("editar/<int:id_contacto>/", views.editarContacto, name="editarContacto"),
-    path("duplicados/", views.manejarDuplicado, name="manejarDuplicados"),
+    path("duplicados/", views.insertarDuplicado, name="insertarDuplicados"),
+    path("duplicados/<int:id_contacto>/", views.editarDuplicado, name="editarDuplicados"),
     path("subir/<int:id_contacto>", views.subirContactos, name="subirContactos"),
 ]
