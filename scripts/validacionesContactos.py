@@ -54,6 +54,8 @@ def filtrarContactosDuplicados(c):
         # si el contacto esta registrado
         contactos = Contacto.objects.exclude(pk=c.pk)
 
+    print(c.pk, c.nombre, c.apellido_paterno, c.apellido_materno, c.telefono, c.curp, c.clave_elector, c.seccion, c.parent)
+
     coincidencias = contactos.filter(
         # caso 1: nombre y apellido
         (Q(nombre__iexact=c.nombre) &
@@ -66,6 +68,8 @@ def filtrarContactosDuplicados(c):
         # caso 4: telefono
         (Q(telefono=c.telefono) & Q(telefono__isnull=False))
     )
+
+    print(len(coincidencias))
 
     return coincidencias
     

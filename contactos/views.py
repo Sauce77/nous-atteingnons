@@ -131,11 +131,9 @@ def editarContacto(request, id_contacto):
 
                     # guardamos la informacion en la sesion
                     request.session['datos_contacto'] = contacto_cleaned_data
-                    # guardamos el id de contacto
-                    request.session['id_contacto'] = contacto.id
+
                     # si existen contactos repetidos redirigir a manejarDuplicados
-                    # return redirect("contactos:manejarDuplicados")
-                    return HttpResponse("EDITAR DUPLICADOS")
+                    return redirect("contactos:editarDuplicados", id_contacto=contacto.pk)
                 
                 else:
                     # guardamos los cambios realizados
@@ -289,6 +287,56 @@ def insertarDuplicado(request):
 
     return render(request, "contactos/mostrarDuplicados.html", contexto)
 
+
+def editarDuplicado(request, id_contacto):
+    """
+        Al editar un nuevo contacto, existe una coincidencia.
+        Se muestran las coincidencias.
+    """
+
+    # obtenemos el contacto
+    contacto = get_object_or_404(Contacto, pk=id_contacto)
+
+    # obtenemos los datos del contacto
+    datos_contacto = request.session["datos_contacto"]
+
+    # modificamos los datos del contacto
+    contacto.nombre = datos_contacto["nombre"]
+    contacto.apellido_paterno = datos_contacto["apellido_paterno"]
+    contacto.apellido_materno = datos_contacto["apellido_materno"]
+    contacto.telefono = datos_contacto["telefono"]
+    contacto.email = datos_contacto["email"]
+    contacto.curp = datos_contacto["curp"]
+    contacto.clave_elector = datos_contacto["clave_elector"]
+    contacto.domicilio = datos_contacto["domicilio"]
+    
+    # obtenemos seccion
+    numero_seccion = datos_contacto["seccion"]
+    seccion = get_object_or_404(Seccion,pk=numero_seccion)
+    # asignamos seccion
+    contacto.seccion = seccion
+
+    # obtenemos contacto asociado
+    id_contacto_asociado = datos_contacto["parent"]
+    contacto_asociado = get_object_or_404(Contacto,pk=id_contacto_asociado)
+    # asignamos contacto asociado
+    contacto.parent = contacto_asociado
+    
+    # form con datos modificados
+    form = ContactoForm(instance=contacto)
+    # guardamos la instancia del contacto
+    contacto_modificado = form.save(commit=False)
+
+    # obtenemos las coincidencias
+    coincidencias = filtrarContactosDuplicados(contacto_modificado)
+
+    contexto = {
+        "contacto": contacto,
+        "contactos": coincidencias,
+        "form": form
+    }
+
+    return render(request, "contactos/mostrarDuplicados.html", contexto)
 
 
 def subirContactos(request, id_contacto):
