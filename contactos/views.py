@@ -438,7 +438,7 @@ def home(request):
         ).order_by('-num_descendientes')[:10]
     
     # obtenemos diez contactos recientes
-    contactos_recientes = Contacto.objects.all()[:10]
+    contactos_recientes = Contacto.objects.order_by('-fecha_modificacion')[:10]
 
     contexto ={
         "contactos_registrados": contactos_registrados,

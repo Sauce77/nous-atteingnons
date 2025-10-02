@@ -38,6 +38,9 @@ class Contacto(MPTTModel):
         'D': 'Desafiliado'
     }
 
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_modificacion = models.DateTimeField(auto_now=True)
+
     nombre = models.CharField(max_length=150, null=False, blank=False)
     apellido_paterno = models.CharField(max_length=150, null=False, blank=False)
     apellido_materno = models.CharField(max_length=150, null=False, blank=False)
