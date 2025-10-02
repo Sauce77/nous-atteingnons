@@ -420,4 +420,34 @@ def home(request):
         Renderiza el inicio de la aplicacion.
     """
 
-    return render(request, "core/home.html")
+    # obtenemos el total de contactos registrados
+    contactos_registrados = Contacto.objects.count()
+
+    # obtenemos el total de contactos afiliados
+    contactos_afiliados = Contacto.objects.filter(estatus='A').count()
+
+    # obtenemos el total de contactos del mes
+    contactos_del_mes = 5
+
+    # obtenemos el total de contactos desafiliados
+    contactos_desafiliados = Contacto.objects.filter(estatus='D').count()
+
+    # obtenemos diez contactos con mayor alcance
+    contactos_alcance = Contacto.objects.annotate(
+            num_descendientes= (F('rght') - F('lft') - 1) / 2
+        ).order_by('-num_descendientes')[:10]
+    
+    # obtenemos diez contactos recientes
+    contactos_recientes = Contacto.objects.all()[:10]
+
+    contexto ={
+        "contactos_registrados": contactos_registrados,
+        "contactos_afiliados": contactos_afiliados,
+        "contactos_del_mes": contactos_del_mes,
+        "contactos_desafiliados": contactos_desafiliados,
+        "contactos_alcance": contactos_alcance,
+        "contactos_recientes": contactos_recientes,
+    }
+
+
+    return render(request, "core/home.html", contexto)
