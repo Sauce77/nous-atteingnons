@@ -5,6 +5,7 @@ from django.db.models import F
 
 import openpyxl
 import datetime
+from dateutil.relativedelta import relativedelta
 
 from scripts.validacionesContactos import filtrarContactosDuplicados, existenCoincidencias
 from scripts.operacionesContactos import borrarContacto, obtenerDescendientesPlano, insertarContactosExcel
@@ -471,8 +472,11 @@ def home(request):
     # obtenemos el total de contactos afiliados
     contactos_afiliados = Contacto.objects.filter(estatus='A').count()
 
+    # obtenemos tiempo actual - un mes
+    tiempo_mes = datetime.datetime.today() - relativedelta(months=1)
+
     # obtenemos el total de contactos del mes
-    contactos_del_mes = 5
+    contactos_del_mes = Contacto.objects.filter(fecha_creacion__gt=tiempo_mes).count()
 
     # obtenemos el total de contactos desafiliados
     contactos_desafiliados = Contacto.objects.filter(estatus='D').count()

@@ -72,9 +72,27 @@
                                                         {{ contacto.apellido_paterno }} {{ contacto.apellido_materno}}, {{ contacto.nombre }}
                                                     </a>
                                                 </td>
-                                                <td>{{ contacto.telefono }}</td>
-                                                <td>{{ contacto.curp }}</td>
-                                                <td>{{ contacto.clave_elector }}</td>
+                                                <td>
+                                                    {% if contacto.telefono %}
+                                                        {{ contacto.telefono }}
+                                                    {% else %}
+                                                        No registrado
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if contacto.curp %}
+                                                        {{ contacto.curp }}
+                                                    {% else %}
+                                                        No registrada
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if contacto.clave_elector %}
+                                                        {{ contacto.clave_elector }}
+                                                    {% else %}
+                                                        No registrada
+                                                    {% endif %}
+                                                </td>
                                                 <td>{{ contacto.num_descendientes }} contacto(s)</td>
                                             </tr>
                                         {% endfor %}
@@ -107,9 +125,27 @@
                                                         {{ contacto.apellido_paterno }} {{ contacto.apellido_materno}}, {{ contacto.nombre }}
                                                     </a>
                                                 </td>
-                                                <td>{{ contacto.telefono }}</td>
-                                                <td>{{ contacto.curp }}</td>
-                                                <td>{{ contacto.clave_elector }}</td>
+                                                <td>
+                                                    {% if contacto.telefono %}
+                                                        {{ contacto.telefono }}
+                                                    {% else %}
+                                                        No registrado
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if contacto.curp %}
+                                                        {{ contacto.curp }}
+                                                    {% else %}
+                                                        No registrada
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if contacto.clave_elector %}
+                                                        {{ contacto.clave_elector }}
+                                                    {% else %}
+                                                        No registrada
+                                                    {% endif %}
+                                                </td>
                                             </tr>
                                         {% endfor %}
                                     </tbody>
