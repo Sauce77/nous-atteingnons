@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block headers %}
+    <!-- Google Charts -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+{% endblock %}
+
+{% block content %}
+
+{% include "contactos/componentes/tarjetaContacto.html" %}
+
+<!-- diagrama jerarquico -->
+<h5 class="text-center">Red de Alcance</h5>
+<div id="chart_div"></div>
+
+<script>
+      const apiUrl = "{{ api_url }}"; 
+      var urlNodo = "{% url 'contactos:mostrarPerfilContacto' id_contacto=0 %}";
+</script>
+
+<script type="text/javascript" src="{% static 'scripts/contactos/organigrama.js' %}"></script>
+
+{% endblock %}

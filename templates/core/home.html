@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <h1 class="h3 mb-4">Resumen General</h1>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-6 col-lg-3">
+                    <div class="card stat-card border-dark">
+                        <div class="card-body">
+                            <div>
+                                <h5 class="card-title text-muted fw-normal mb-1">Contactos Registrados</h5>
+                                <h2 class="mb-0 fw-bold">{{ contactos_registrados }} contacto(s)</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="card stat-card border-primary">
+                        <div class="card-body">
+                            <div>
+                                <h5 class="card-title text-muted fw-normal mb-1">Alcance</h5>
+                                <h2 class="mb-0 fw-bold">{{ contactos_afiliados }} contacto(s)</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="card stat-card border-success">
+                        <div class="card-body">
+                            <div>
+                                <h5 class="card-title text-muted fw-normal mb-1">Contactos nuevos del mes</h5>
+                                <h2 class="mb-0 fw-bold">{{ contactos_del_mes }} contacto(s)</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                 <div class="col-md-6 col-lg-3">
+                    <div class="card stat-card border-danger">
+                        <div class="card-body">
+                            <div>
+                                <h5 class="card-title text-muted fw-normal mb-1">Contactos desafiliados</h5>
+                                <h2 class="mb-0 fw-bold">{{ contactos_desafiliados }} contacto(s)</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-7">
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Contactos con mayor alcance</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-striped table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Nombre</th>
+                                            <th>Telefono</th>
+                                            <th>CURP</th>
+                                            <th>Clave Elector</th>
+                                            <th>Alcance</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for contacto in contactos_alcance %}
+                                            <tr>
+                                                <td>
+                                                    <a href="{% url 'contactos:mostrarPerfilContacto' id_contacto=contacto.pk %}">
+                                                        {{ contacto.apellido_paterno }} {{ contacto.apellido_materno}}, {{ contacto.nombre }}
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    {% if contacto.telefono %}
+                                                        {{ contacto.telefono }}
+                                                    {% else %}
+                                                        No registrado
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if contacto.curp %}
+                                                        {{ contacto.curp }}
+                                                    {% else %}
+                                                        No registrada
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if contacto.clave_elector %}
+                                                        {{ contacto.clave_elector }}
+                                                    {% else %}
+                                                        No registrada
+                                                    {% endif %}
+                                                </td>
+                                                <td>{{ contacto.num_descendientes }} contacto(s)</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Ultimas modificaciones</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Nombre</th>
+                                            <th>Telefono</th>
+                                            <th>CURP</th>
+                                            <th>Clave Elector</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for contacto in contactos_recientes %}
+                                            <tr>
+                                                <td>
+                                                    <a href="{% url 'contactos:mostrarPerfilContacto' id_contacto=contacto.pk %}">
+                                                        {{ contacto.apellido_paterno }} {{ contacto.apellido_materno}}, {{ contacto.nombre }}
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    {% if contacto.telefono %}
+                                                        {{ contacto.telefono }}
+                                                    {% else %}
+                                                        No registrado
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if contacto.curp %}
+                                                        {{ contacto.curp }}
+                                                    {% else %}
+                                                        No registrada
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if contacto.clave_elector %}
+                                                        {{ contacto.clave_elector }}
+                                                    {% else %}
+                                                        No registrada
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+{% endblock %}

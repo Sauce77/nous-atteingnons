@@ -1,0 +1,74 @@
+{% block headers %}
+    {{ form.media.css }}
+{% endblock %}
+
+<!-- form para insertar contacto -->
+
+<form method="post">
+    {% csrf_token %}
+
+
+    <div class="row">
+        <div class="col-lg-6">
+            <p>Contacto Asociado: {{ form.parent }}</p>
+            
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <p>Seccion: {{ form.seccion }}</p>
+        </div>
+    </div>
+    
+    
+    
+    <div class="form-floating">
+        {{ form.nombre }}
+        <label for="{{ form.nombre.id_for_label }}">Nombre(s)</label>
+    </div><!-- input nombre -->
+
+    <div class="d-flex flex-row gap-1 mb-2">
+        <div class="form-floating flex-fill">
+            {{ form.apellido_paterno }}
+            <label for="{{ form.apellido_paterno.id_for_label }}">Apellido Paterno</label>
+        </div><!-- input apellido paterno -->
+        <div class="form-floating flex-fill">
+            {{ form.apellido_materno }}
+            <label for="{{ form.apellido_materno.id_for_label }}">Apellido Materno</label>
+        </div><!-- input apellido materno -->
+    </div>
+
+    <div class="form-floating">
+        {{ form.email }}
+        <label for="{{ form.email.id_for_label }}">Email</label>
+    </div><!-- input email -->
+
+    <div class="form-floating">
+        {{ form.telefono }}
+        <label for="{{ form.telefono.id_for_label}}">Telefono</label>
+    </div><!-- input telefono -->
+
+    <div class="form-floating">
+        {{ form.curp }}
+        <label for="{{ form.curp.id_for_label }}">CURP</label>
+    </div><!-- input curp -->
+
+    <div class="form-floating">
+        {{ form.clave_elector }}
+        <label for="{{ form.clave_elector.id_for_label }}">Clave Elector</label>
+    </div><!-- input clave elector -->
+    
+    <div class="form-floating">
+        {{ form.domicilio }}
+        <label for="{{ form.domicilio.id_for_label }}">Domicilio</label>
+    </div><!-- input domicilio -->
+
+    <input type="submit" name="btnSubmitContacto" class="btn btn-primary" value="Aceptar">
+    {% if contacto.pk %}
+        <a href="{% url 'contactos:mostrarPerfilContacto' id_contacto=contacto.pk %}" class="btn btn-danger text-decoration-none text-white">Cancelar</a>
+    {% else %}
+        <a href="{% url 'contactos:mostrarContactos' %}" class="btn btn-danger text-decoration-none text-white">Cancelar</a>
+    {% endif %}
+
+</form>
+
+
+{{ form.media.js }}

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Contactos duplicados</h1>
+
+    <div class="row my-2">
+        <div class="col-lg-4 border-end">
+            <p>¿Desea conservar este contacto?</p>
+            {% include "contactos/componentes/formContacto.html" %}
+        </div>
+        <div class="col-lg-8">
+            {% include "contactos/componentes/tablaContactos.html" %}
+        </div>
+    </div>
+
+{% endblock %}

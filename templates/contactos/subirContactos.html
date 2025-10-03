@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <h3 class="mb-3">Insertar contactos de <a href="{% url 'contactos:mostrarPerfilContacto' id_contacto=contacto.pk %}" class="link-dark">
+        {{ contacto.apellido_paterno }} {{ contacto.apellido_materno }}, {{ contacto.nombre }}</a>
+    </h3>
+
+    <p>Cargue un archivo de Excel para insertar contactos.</p>
+
+    <div class="d-flex flex-row">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <p>Subir archivo: {{ form.archivo }} <input type="submit" name="btnSubirContactos" class="btn btn-primary" value="Subir"></p>
+        </form>
+    </div>
+    
+
+    {% if contactos %}
+        {% include "contactos/componentes/tablaContactos.html" %}
+    {% endif %}
+
+
+{% endblock %}

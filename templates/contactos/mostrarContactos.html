@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{{ titulo }}</h1>
+
+    <div class="d-flex flex-row gap-2">
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" name="btnDescargarExcel" class="btn btn-success" value="Descargar">Descargar Contactos</button>
+        </form>
+
+        <a href="{% url 'contactos:insertarContacto' %}" class="btn btn-primary">Nuevo Contacto</a>
+    </div>
+    
+    {% include "contactos/componentes/tablaContactos.html" %}
+
+
+{% endblock %}
